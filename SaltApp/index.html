@@ -3215,17 +3215,13 @@
                         <img id="landingCompanionImg" src="character_calm_mixed_1786645967568.jpg" alt="3D Companion" />
                     </div>
 
-                    <!-- Companion Guide Switcher -->
-                    <div style="display: flex; justify-content: center; gap: 8px; margin-top: -8px; margin-bottom: 8px; z-index: 5; position: relative;">
-                        <button onclick="setCompanionProfile('mixed')" class="profile-switch-btn active" id="btn-profile-mixed">Blended Guide</button>
-                        <button onclick="setCompanionProfile('beige')" class="profile-switch-btn" id="btn-profile-beige">Sage Guide</button>
-                        <button onclick="setCompanionProfile('grey')" class="profile-switch-btn" id="btn-profile-grey">Guardian Guide</button>
-                    </div>
+                    <!-- Guardian selection occurs during onboarding -->
+                    <div style="height: 16px;"></div>
 
                     <div class="splash-bottom-block">
                         <h1 class="splash-title">Be salt.<br>Shake the world.</h1>
                         <div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
-                            <button class="locket-cta-btn" onclick="goToGoalSelector()" style="width: 100%;">
+                            <button class="locket-cta-btn" onclick="goToGuardianSelector()" style="width: 100%;">
                                 <span>Get Started</span>
                                 <span>→</span>
                             </button>
@@ -4468,6 +4464,14 @@
                             let profileData;
                             if (doc.exists) {
                                 profileData = doc.data();
+                                
+                                // Sync saved Guardian ID
+                                if (profileData.guardianId) {
+                                    selectedCompanionProfile = profileData.guardianId;
+                                    localStorage.setItem('salt_companion_profile', selectedCompanionProfile);
+                                    setCompanionProfile(selectedCompanionProfile);
+                                }
+                                
                                 // Run streak calculation
                                 profileData = checkAndUpdateStreak(profileData, profileData.completions || []);
                                 // Sync back
@@ -4478,6 +4482,7 @@
                                 });
                             } else {
                                 // Create new authenticated user profile doc in Firestore
+                                const localCompanion = localStorage.getItem('salt_companion_profile') || 'mixed';
                                 profileData = {
                                     name: user.displayName || user.email.split('@')[0],
                                     email: user.email,
@@ -4488,7 +4493,8 @@
                                     completed: 1,
                                     gists: 0,
                                     completions: [getTodayDateString()],
-                                    createdAt: new Date().toISOString()
+                                    createdAt: new Date().toISOString(),
+                                    guardianId: localCompanion
                                 };
                                 firestoreDb.collection("users").doc(user.uid).set(profileData);
                             }
@@ -6172,12 +6178,12 @@
 // Progress bar setup
                     const pBar = document.getElementById('obProgressBar');
                     const pFill = document.getElementById('obProgressFill');
-                    if (targetId === 'obScreen-5') {
+                    if (targetId === 'obScreen-6') {
                         pBar.style.display = 'none';
                     } else if (targetId === 'obScreen-2') {
                         pBar.style.display = 'block';
-                        pFill.style.width  = '25%';
-                        updateLivePreview('kindness');
+                        pFill.style.width  = '20%';
+                        selectObGuardian(selectedCompanionProfile);
                     } else {
                         pBar.style.display = 'none';
                     }
@@ -6580,6 +6586,78 @@
             previewEl.innerHTML = previewTemplates[goal];
         }
 
+        function selectObGuardian(profile) {
+            playPopSound();
+            
+            // Update selections in UI
+            const mixedCard = document.getElementById('obGuardCard-mixed');
+            const beigeCard = document.getElementById('obGuardCard-beige');
+            const greyCard = document.getElementById('obGuardCard-grey');
+            
+            if (mixedCard) mixedCard.classList.remove('selected');
+            if (beigeCard) beigeCard.classList.remove('selected');
+            if (greyCard) greyCard.classList.remove('selected');
+            
+            const selectedCard = document.getElementById(`obGuardCard-${profile}`);
+            if (selectedCard) selectedCard.classList.add('selected');
+            
+            // Set the active profile
+            selectedCompanionProfile = profile;
+            localStorage.setItem('salt_companion_profile', profile);
+            
+            // Personality Dialogue Mapping
+            const guardianProfiles = {
+                mixed: {
+                    name: 'Blended Guide',
+                    desc: 'A warm companion, joyful, energetic, and encouraging.',
+                    glow: 'rgba(77,255,143,0.3)',
+                    bubble: 'Hey there! So excited to start this journey and share some acts of love with you!'
+                },
+                beige: {
+                    name: 'Sage Guide',
+                    desc: 'A thoughtful mentor, quiet, calm, and reflective.',
+                    glow: 'rgba(212,255,77,0.3)',
+                    bubble: 'Greetings. I am honored to walk beside you in stillness, consistency, and prayer.'
+                },
+                grey: {
+                    name: 'Guardian Guide',
+                    desc: 'A resilient shield, silent, strong, and protective.',
+                    glow: 'rgba(255,107,69,0.3)',
+                    bubble: 'I stand with you. Let\'s make every action strong, disciplined, and intentional.'
+                }
+            };
+            
+            const config = guardianProfiles[profile];
+            
+            // Update Live Preview fields
+            const pImg = document.getElementById('guardianPreviewImg');
+            const pName = document.getElementById('guardianPreviewName');
+            const pDesc = document.getElementById('guardianPreviewDesc');
+            const pGlow = document.getElementById('guardianPreviewGlow');
+            const pBubble = document.getElementById('obMascotBubble2');
+            const pMascotImg = document.getElementById('obMascotImg2');
+            
+            if (pImg) pImg.src = companionImages[profile].calm;
+            if (pName) pName.innerText = config.name;
+            if (pDesc) pDesc.innerText = `"${config.desc}"`;
+            if (pGlow) pGlow.style.background = config.glow;
+            if (pBubble) pBubble.innerText = config.bubble;
+            if (pMascotImg) pMascotImg.src = companionImages[profile].calm;
+            
+            // Acknowledge reaction - trigger a quick celebrate posture preview!
+            if (pImg) {
+                pImg.src = companionImages[profile].celebrating;
+                if (pMascotImg) pMascotImg.src = companionImages[profile].celebrating;
+                setTimeout(() => {
+                    if (pImg) pImg.src = companionImages[profile].calm;
+                    if (pMascotImg) pMascotImg.src = companionImages[profile].calm;
+                }, 1000);
+            }
+            
+            // Apply profile changes globally (so other views are in sync!)
+            setCompanionProfile(profile);
+        }
+
         function selectObGoal(card, goal) {
             playPopSound();
             const list = card.parentElement;
@@ -6693,21 +6771,12 @@
 // Onboarding skip handler
         function skipToSignUp() {
             playPopSound();
-            
-            // ═════════════════════════════════════════════════════════
-// Hide all onboarding screens
             document.querySelectorAll('.onboarding-screen').forEach(screen => {
                 screen.classList.remove('active');
             });
-            
-            // ═════════════════════════════════════════════════════════
-// Show Screen 5
-            const s5 = document.getElementById('obScreen-5');
-            s5.classList.add('active', 'slide-in');
-            setTimeout(() => s5.classList.remove('slide-in'), 400);
-
-            // ═════════════════════════════════════════════════════════
-// Progress bar to 100%
+            const s6 = document.getElementById('obScreen-6');
+            s6.classList.add('active', 'slide-in');
+            setTimeout(() => s6.classList.remove('slide-in'), 400);
             document.getElementById('obProgressBar').style.display = 'block';
             document.getElementById('obProgressFill').style.width = '100%';
         }
@@ -6721,39 +6790,65 @@
             const pBar = document.getElementById('obProgressBar');
             const pFill = document.getElementById('obProgressFill');
             
-            if (curr === 5) {
-                // ═════════════════════════════════════════════════════════
-// From Screen 5, go back to Landing Page (obScreen-1)
+            if (curr === 6) { // Signup Screen
+                prevScreenId = 'obScreen-5';
+                pFill.style.width = '80%';
+            } else if (curr === 5) { // Reminder Time
+                prevScreenId = 'obScreen-4';
+                pFill.style.width = '60%';
+            } else if (curr === 4) { // Pace Selector
+                prevScreenId = 'obScreen-3';
+                pFill.style.width = '40%';
+            } else if (curr === 3) { // Goal Selector
+                prevScreenId = 'obScreen-2';
+                pFill.style.width = '20%';
+            } else if (curr === 2) { // Guardian Selector
                 prevScreenId = 'obScreen-1';
                 pBar.style.display = 'none';
-            } else if (curr === 2) {
-                // ═════════════════════════════════════════════════════════
-// From Screen 2, go back to Screen 5
-                prevScreenId = 'obScreen-5';
-                pFill.style.width = '25%';
-            } else if (curr === 3) {
-                // ═════════════════════════════════════════════════════════
-// From Screen 3, go back to Screen 2
-                prevScreenId = 'obScreen-2';
-                pFill.style.width = '50%';
-            } else if (curr === 4) {
-                // ═════════════════════════════════════════════════════════
-// From Screen 4, go back to Screen 3
-                prevScreenId = 'obScreen-3';
-                pFill.style.width = '75%';
             }
 
             document.getElementById(`obScreen-${curr}`).classList.remove('active');
             
             const prevScreen = document.getElementById(prevScreenId);
-            prevScreen.classList.add('active', 'slide-in');
-            setTimeout(() => prevScreen.classList.remove('slide-in'), 400);
+            if (prevScreen) {
+                prevScreen.classList.add('active', 'slide-in');
+                setTimeout(() => prevScreen.classList.remove('slide-in'), 400);
+            }
+        }
+
+        function nextObScreen(curr) {
+            playPopSound();
+            
+            let nextScreenId;
+            const pFill = document.getElementById('obProgressFill');
+            
+            if (curr === 2) { // Guardian Selector -> Goal Selector
+                nextScreenId = 'obScreen-3';
+                pFill.style.width = '40%';
+                updateLivePreview('kindness');
+            } else if (curr === 3) { // Goal Selector -> Pace Selector
+                nextScreenId = 'obScreen-4';
+                pFill.style.width = '60%';
+            } else if (curr === 4) { // Pace Selector -> Reminder Time
+                nextScreenId = 'obScreen-5';
+                pFill.style.width = '80%';
+            } else if (curr === 5) { // Reminder Time -> Streak Profile Signup
+                nextScreenId = 'obScreen-6';
+                pFill.style.width = '100%';
+            }
+
+            document.getElementById(`obScreen-${curr}`).classList.remove('active');
+            
+            const nextScreen = document.getElementById(nextScreenId);
+            if (nextScreen) {
+                nextScreen.classList.add('active', 'slide-in');
+                setTimeout(() => nextScreen.classList.remove('slide-in'), 400);
+            }
         }
 
 // Validate and progress from Streak Profile Signup (Screen 5)
         function finishSignUpAndProceed() {
-            // ═════════════════════════════════════════════════════════
-// Get signup details
+            // Get signup details
             const nameEl = document.getElementById('obFirstName');
             const emailEl = document.getElementById('obEmail');
             const passwordEl = document.getElementById('obPassword');
@@ -6763,8 +6858,7 @@
             const password = passwordEl.value.trim();
             const bio = document.getElementById('obBioInput').value.trim() || 'Building daily faith habits.';
 
-            // ═════════════════════════════════════════════════════════
-// Clear errors
+            // Clear errors
             clearInputError('obFirstName');
             clearInputError('obEmail');
             clearInputError('obPassword');
@@ -6795,42 +6889,104 @@
                 return;
             }
 
-            // ═════════════════════════════════════════════════════════
-// Save auth state
-            isLoggedIn = true;
-            localStorage.setItem('salt_logged_in', 'true');
-            
-            const isAdmin = email.toLowerCase() === 'teeutos@gmail.com';
-            localStorage.setItem('salt_is_admin', isAdmin ? 'true' : 'false');
-            
-            const profileData = {
-                name: isAdmin ? 'Teeutos (Admin)' : name,
-                email: email,
-                bio: isAdmin ? 'SALT System Control Administrator 🛠️' : bio,
-                reminderTime: '08:00',
-                streak: 14,
-                completed: 28,
-                gists: 12
-            };
-            localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
+            if (useFirebase) {
+                const signupBtn = document.getElementById('signUpSubmitBtn');
+                const btnText = signupBtn ? signupBtn.querySelector('span') : null;
+                const originalText = btnText ? btnText.innerText : 'Create Account';
+                if (btnText) btnText.innerText = "Creating Profile...";
+                if (signupBtn) {
+                    signupBtn.style.opacity = "0.7";
+                    signupBtn.style.pointerEvents = "none";
+                }
 
-            updateAppAuthState();
+                authObj.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        return user.updateProfile({
+                            displayName: name
+                        }).then(() => {
+                            // Create Firestore user record
+                            const todayStr = getTodayDateString();
+                            const newProfile = {
+                                name: name,
+                                email: email,
+                                bio: bio,
+                                reminderTime: '08:00',
+                                streak: 1,
+                                longestStreak: 1,
+                                completed: 1,
+                                gists: 0,
+                                completions: [todayStr],
+                                isAccepted: false,
+                                isCompleted: false,
+                                lastActiveDate: todayStr,
+                                createdAt: new Date().toISOString(),
+                                guardianId: selectedCompanionProfile
+                            };
+                            return firestoreDb.collection("users").doc(user.uid).set(newProfile).then(() => {
+                                console.log("🔥 Firestore profile successfully compiled.");
+                                localStorage.setItem('salt_onboarding_completed', 'true');
+                                
+                                const obOverlay = document.getElementById('viewOnboarding');
+                                if (obOverlay) {
+                                    obOverlay.style.opacity = '0';
+                                    setTimeout(() => {
+                                        obOverlay.style.display = 'none';
+                                        obOverlay.style.transform = 'none';
+                                    }, 300);
+                                }
+                                
+                                playTabTickSound();
+                                setTimeout(playPopSound, 100);
+                                triggerConfettiBurst();
+                            });
+                        });
+                    })
+                    .catch((err) => {
+                        console.error("Firebase Signup Error:", err);
+                        showInputError('obEmail', err.message || 'Failed to create profile.');
+                        if (btnText) btnText.innerText = originalText;
+                        if (signupBtn) {
+                            signupBtn.style.opacity = "1";
+                            signupBtn.style.pointerEvents = "auto";
+                        }
+                    });
+            } else {
+                isLoggedIn = true;
+                localStorage.setItem('salt_logged_in', 'true');
+                localStorage.setItem('salt_onboarding_completed', 'true');
 
-            // ═════════════════════════════════════════════════════════
-// Play completion chime & show confetti blast
-            playTabTickSound();
-            setTimeout(playPopSound, 100);
-            triggerConfettiBurst();
+                const isAdmin = email.toLowerCase() === 'teeutos@gmail.com';
+                localStorage.setItem('salt_is_admin', isAdmin ? 'true' : 'false');
+                
+                const profileData = {
+                    name: isAdmin ? 'Teeutos (Admin)' : name,
+                    email: email,
+                    bio: isAdmin ? 'SALT System Control Administrator 🛠️' : bio,
+                    reminderTime: '08:00',
+                    streak: 1,
+                    longestStreak: 1,
+                    completed: 1,
+                    gists: 0,
+                    completions: [getTodayDateString()],
+                    guardianId: selectedCompanionProfile
+                };
+                localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
 
-            // ═════════════════════════════════════════════════════════
-// Fade and hide onboarding overlay completely (skipping remaining screens)
-            const obOverlay = document.getElementById('viewOnboarding');
-            if (obOverlay) {
-                obOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    obOverlay.style.display = 'none';
-                    obOverlay.style.transform = 'none';
-                }, 300);
+                updateAppAuthState();
+
+                playTabTickSound();
+                setTimeout(playPopSound, 100);
+                triggerConfettiBurst();
+
+                const obOverlay = document.getElementById('viewOnboarding');
+                if (obOverlay) {
+                    obOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        obOverlay.style.display = 'none';
+                        obOverlay.style.transform = 'none';
+                    }, 300);
+                }
             }
         }
 
@@ -6841,10 +6997,10 @@
             const bio = document.getElementById('obBioInput').value.trim() || 'Building daily faith habits.';
             const reminderTime = document.getElementById('obReminderTime').value;
 
-            // ═════════════════════════════════════════════════════════
-// Save auth state
+            // Save auth state
             isLoggedIn = true;
             localStorage.setItem('salt_logged_in', 'true');
+            localStorage.setItem('salt_onboarding_completed', 'true');
             
             const profileData = {
                 name: name,
@@ -6853,7 +7009,8 @@
                 reminderTime: reminderTime,
                 streak: 14,
                 completed: 28,
-                gists: 12
+                gists: 12,
+                guardianId: selectedCompanionProfile
             };
             localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
 
