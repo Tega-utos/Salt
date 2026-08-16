@@ -1,0 +1,16 @@
+{
+  "name": "Salt",
+  "short_name": "Salt",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0B0A09",
+  "theme_color": "#0B0A09",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "character_calm_mixed_1786645967568.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
