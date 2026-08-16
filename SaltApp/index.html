@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -86,11 +86,6 @@
             transition: background 0.3s ease;
         }
 
-        /* Hide simulated iPhone notch completely */
-        .notch {
-            display: none !important;
-        }
-
         /* Desktop Sidebar Navigation Panel */
         .desktop-sidebar-nav {
             display: none; /* Hidden on mobile */
@@ -160,6 +155,9 @@
             .phone-viewport {
                 padding: 40px 50px;
                 overflow-y: auto;
+            }
+            .view-content-wrapper {
+                padding-bottom: 24px;
             }
             .app-header {
                 display: none !important; /* Hide mobile top header */
@@ -337,19 +335,6 @@
             z-index: 80;
         }
 
-        .notch {
-            width: 126px;
-            height: 26px;
-            background: #020203;
-            border-radius: 0 0 16px 16px;
-            margin: 0 auto;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-        }
-
         /* 1. TOP HEADER */
         .app-header {
             padding: 42px 8px 12px;
@@ -458,7 +443,8 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            margin: 6px 0 12px;
+            margin: 6px 0 0;
+            padding-bottom: 90px; /* Space for the floating bottom navigation dock on mobile */
             overflow-y: auto;
         }
 
@@ -466,7 +452,6 @@
 
         /* ⚡ HERO TOUCH FRAME */
         #viewToday {
-            padding-bottom: 70px !important;
             flex: 1;
             background: var(--surface);
             border: 1px solid var(--border);
@@ -1300,6 +1285,9 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
             position: relative;
             z-index: 5;
             padding: 0;
@@ -1532,6 +1520,49 @@
         html[data-theme="light"] .mascot-speech-bubble-side::after {
             border-right: 1px solid rgba(20, 17, 15, 0.08);
             border-top: 1px solid rgba(20, 17, 15, 0.08);
+        }
+
+        /* Unified light mode overrides & class styling */
+        .journal-item-card.companion-card {
+            background: rgba(20, 18, 17, 0.45);
+            border: 1.2px solid rgba(250, 250, 247, 0.12);
+            padding: 18px;
+            margin-bottom: 16px;
+            border-radius: 20px;
+        }
+        html[data-theme="light"] .journal-item-card.companion-card {
+            background: rgba(255, 255, 255, 0.60);
+            border: 1.2px solid rgba(20, 17, 15, 0.08);
+        }
+        html[data-theme="light"] .profile-switch-btn {
+            background: rgba(20, 17, 15, 0.05);
+            border: 1px solid rgba(20, 17, 15, 0.12);
+            color: rgba(20, 17, 15, 0.6);
+        }
+        html[data-theme="light"] .profile-switch-btn:hover {
+            background: rgba(20, 17, 15, 0.1);
+            color: #14110F;
+        }
+        html[data-theme="light"] .profile-switch-btn.active {
+            background: #14110F;
+            color: #FAFAF7;
+            border-color: #14110F;
+        }
+        html[data-theme="light"] .journal-nested-gist {
+            background: rgba(20, 17, 15, 0.04);
+        }
+        html[data-theme="light"] .logbook-progress-bar-bg {
+            background: rgba(20, 17, 15, 0.08);
+            border: 1px solid rgba(20, 17, 15, 0.04);
+        }
+        html[data-theme="light"] .logbook-card {
+            background: rgba(255, 255, 255, 0.60);
+            border: 1.2px solid rgba(20, 17, 15, 0.08);
+        }
+        html[data-theme="light"] .locket-cta-btn-secondary {
+            border: 1px solid rgba(20, 17, 15, 0.15);
+            background: rgba(20, 17, 15, 0.04);
+            color: #14110F;
         }
 
         /* Sticky notification badge */
@@ -2397,8 +2428,8 @@
             pointer-events: none;
         }
 
-        /* MOCK NOTIFICATION BUBBLE */
-        .mock-notification {
+        /* DAILY REMINDER PREVIEW BUBBLE */
+        .reminder-preview-bubble {
             background: rgba(250, 250, 247, 0.08);
             border: 1px solid rgba(250, 250, 247, 0.12);
             backdrop-filter: blur(20px);
@@ -2413,7 +2444,7 @@
             animation: bounceIn 0.5s ease;
             box-sizing: border-box;
         }
-        .mock-notif-icon {
+        .reminder-preview-icon {
             width: 28px;
             height: 28px;
             background: var(--ember);
@@ -2427,14 +2458,14 @@
             color: white;
             flex-shrink: 0;
         }
-        .mock-notif-time {
+        .reminder-preview-time {
             font-size: 9px;
             color: var(--text-muted);
             margin-left: auto;
         }
 
-        /* MOCK PROFILE PREVIEW */
-        .mock-profile-card {
+        /* LIVE PROFILE PREVIEW CARD */
+        .profile-preview-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 20px;
@@ -2706,7 +2737,7 @@
 
         .locket-cta-btn-secondary {
             width: 100%;
-            height: 52px;
+            height: 56px;
             border-radius: 16px;
             border: 1px solid rgba(250, 250, 247, 0.20);
             background: rgba(250, 250, 247, 0.05);
@@ -2976,7 +3007,7 @@
         /* EMBER CTA BUTTON — Duolingo 3D Press */
         .locket-cta-btn {
             width: 100%;
-            height: 58px;
+            height: 56px;
             border-radius: 16px;
             background: var(--ember);
             color: #ffffff;
@@ -3470,15 +3501,15 @@
                             </div>
                         </div>
 
-                        <!-- Mock iPhone Notification Preview -->
+                        <!-- Daily Reminder Preview -->
                         <div class="onboarding-live-preview" style="height: 100px; padding: 12px;">
-                            <div class="mock-notification">
-                                <div class="mock-notif-icon">salt</div>
+                            <div class="reminder-preview-bubble">
+                                <div class="reminder-preview-icon">salt</div>
                                 <div>
                                     <div style="font-size:11px; font-weight:700; color:var(--text-primary);">⚡ Today's Challenge is Live!</div>
                                     <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">“Pay someone's bus fare today...”</div>
                                 </div>
-                                <div class="mock-notif-time" id="mockNotifTime">8:00 AM</div>
+                                <div class="reminder-preview-time" id="reminderPreviewTime">8:00 AM</div>
                             </div>
                         </div>
 
@@ -3489,7 +3520,7 @@
                     </div>
                     
                     <div style="margin: auto 0; text-align: center; z-index: 2; position: relative;">
-                        <input type="time" class="settings-time-input" value="08:00" id="obReminderTime" onchange="updateMockNotifTime(this.value)" style="font-size: 28px; padding: 12px 24px; border-radius: 16px;" />
+                        <input type="time" class="settings-time-input" value="08:00" id="obReminderTime" onchange="updateReminderPreviewTime(this.value)" style="font-size: 28px; padding: 12px 24px; border-radius: 16px;" />
                         <span style="display: block; font-size: 11px; color: rgba(250, 250, 247, 0.6); margin-top: 10px;">Change time to simulate reminder window</span>
                     </div>
 
@@ -3525,13 +3556,13 @@
                             </div>
                         </div>
 
-                        <!-- Live Profile Card Mockup -->
+                        <!-- Live Profile Preview Card -->
                         <div class="onboarding-live-preview" style="height: 76px; padding: 10px;">
-                            <div class="mock-profile-card" style="background: rgba(20, 18, 17, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(250,250,247,0.12); padding: 10px;">
-                                <div class="compose-avatar" id="mockProfileAvatar" style="width:34px; height:34px; border-radius:50%; background:var(--volt-subtle); border:1px solid var(--volt); color:var(--volt); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">🥰</div>
+                            <div class="profile-preview-card" style="background: rgba(20, 18, 17, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(250,250,247,0.12); padding: 10px;">
+                                <div class="compose-avatar" id="profilePreviewAvatar" style="width:34px; height:34px; border-radius:50%; background:var(--volt-subtle); border:1px solid var(--volt); color:var(--volt); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">🥰</div>
                                 <div style="text-align:left;">
-                                    <div id="mockProfileName" style="font-size:12.5px; font-weight:700; color:#FAFAF7;">Your Name</div>
-                                    <div id="mockProfileBio" style="font-size:10.5px; color:rgba(250, 250, 247, 0.7); margin-top:2px; max-width:210px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Enter bio description below...</div>
+                                    <div id="profilePreviewName" style="font-size:12.5px; font-weight:700; color:#FAFAF7;">Your Name</div>
+                                    <div id="profilePreviewBio" style="font-size:10.5px; color:rgba(250, 250, 247, 0.7); margin-top:2px; max-width:210px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Enter bio description below...</div>
                                 </div>
                             </div>
                         </div>
@@ -3545,7 +3576,7 @@
                     <div class="onboarding-input-group" style="z-index: 2; position: relative; gap: 12px; margin-top: 14px;">
                         <div class="form-field">
                             <label for="obFirstName">First Name</label>
-                            <input type="text" class="onboarding-text-input" id="obFirstName" placeholder="Enter your first name" value="" oninput="updateMockProfileName(this.value); clearInputError('obFirstName'); checkSignUpFormValidity();" style="height: 42px; font-size: 13px;" />
+                            <input type="text" class="onboarding-text-input" id="obFirstName" placeholder="Enter your first name" value="" oninput="updateProfilePreviewName(this.value); clearInputError('obFirstName'); checkSignUpFormValidity();" style="height: 42px; font-size: 13px;" />
                             <span class="field-error" id="error-obFirstName"></span>
                         </div>
                         <div class="form-field">
@@ -3560,11 +3591,11 @@
                         </div>
                         <div class="form-field">
                             <label for="obBioInput">Bio Description (Optional)</label>
-                            <input type="text" class="onboarding-text-input" id="obBioInput" placeholder="e.g. Building daily faith habits." value="" oninput="updateMockProfileBio(this.value)" style="height: 42px; font-size: 13px;" />
+                            <input type="text" class="onboarding-text-input" id="obBioInput" placeholder="e.g. Building daily faith habits." value="" oninput="updateProfilePreviewBio(this.value)" style="height: 42px; font-size: 13px;" />
                         </div>
                     </div>
 
-                    <button class="locket-cta-btn" id="signUpSubmitBtn" onclick="finishSignUpAndProceed()" style="background: var(--volt); color: #14110F; width: 100%; height: 52px; border-radius: 16px; border: none; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; cursor: not-allowed; opacity: 0.4; box-shadow: none; z-index: 2; position: relative; margin-top: 10px; pointer-events: none;" disabled>
+                    <button class="locket-cta-btn" id="signUpSubmitBtn" onclick="finishSignUpAndProceed()" style="background: var(--volt); color: #14110F; width: 100%; height: 56px; border-radius: 16px; border: none; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; cursor: not-allowed; opacity: 0.4; box-shadow: none; z-index: 2; position: relative; margin-top: 10px; pointer-events: none;" disabled>
                         <span>Create Account</span>
                         <span>→</span>
                     </button>
@@ -3989,9 +4020,9 @@
                     </div>
                 </div>
 
-                <!-- 3D Companion Customization Bezel Card -->
-                <div class="journal-item-card" style="background: rgba(20, 18, 17, 0.45); border: 1.2px solid rgba(250,250,247,0.12); padding: 18px; margin-bottom: 16px; border-radius: 20px;">
-                    <h3 style="font-family: 'Bricolage Grotesque'; font-size: 15px; font-weight: 800; color: #FAFAF7; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; margin-top: 0;">
+                <!-- Companion Customization Card -->
+                <div class="journal-item-card companion-card">
+                    <h3 style="font-family: 'Bricolage Grotesque'; font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; margin-top: 0;">
                         <span>🧂</span> Streak Companion Guide
                     </h3>
                     
@@ -4002,7 +4033,7 @@
                         </div>
                         
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-                            <span style="font-size: 11px; color: rgba(250,250,247,0.5); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; text-align: left; display: block;">Select active guide</span>
+                            <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; text-align: left; display: block;">Select active guide</span>
                             <div style="display: flex; gap: 8px;">
                                 <button onclick="setCompanionProfile('mixed')" class="profile-switch-btn active" id="btn-profile-mixed" style="flex: 1;">Blended</button>
                                 <button onclick="setCompanionProfile('beige')" class="profile-switch-btn" id="btn-profile-beige" style="flex: 1;">Sage</button>
@@ -4472,6 +4503,15 @@
                                     setCompanionProfile(selectedCompanionProfile);
                                 }
                                 
+                                // Sync saved Companion level & progression
+                                if (profileData.guideLevel !== undefined) {
+                                    localStorage.setItem('salt_guide_level', profileData.guideLevel);
+                                    localStorage.setItem('salt_guide_wp', profileData.guideWp || 0);
+                                    localStorage.setItem('salt_stats_acts_supported', profileData.actsSupported || 0);
+                                    localStorage.setItem('salt_stats_bread_eaten', profileData.breadEaten || 0);
+                                    localStorage.setItem('salt_stats_gists_shared', profileData.gistsShared || 0);
+                                }
+                                
                                 // Run streak calculation
                                 profileData = checkAndUpdateStreak(profileData, profileData.completions || []);
                                 // Sync back
@@ -4634,6 +4674,7 @@
                 tabProfile.classList.add('active');
                 viewProfile.style.display = 'flex';
             }
+            syncSidebarState();
             resetIdleTimer();
         }
 
@@ -4721,6 +4762,45 @@
                         </svg>
                         ${streakCount} Days
                     `;
+                }
+            }
+
+            // 4. Restore daily challenge CTA button & weekly dot states
+            const completionsArray = profileData ? (profileData.completions || []) : [];
+            updateWeeklyProgressRow(completionsArray);
+
+            isAccepted = profileData ? (profileData.isAccepted || false) : false;
+            isCompleted = profileData ? (profileData.isCompleted || false) : false;
+
+            const ctaBtn = document.getElementById('ctaBtn');
+            const resetRow = document.getElementById('resetTimerRow');
+            const todayDot = document.getElementById('day-1');
+
+            if (ctaBtn) {
+                if (isCompleted) {
+                    ctaBtn.className = 'locket-cta-btn completed';
+                    ctaBtn.innerHTML = '<span>✓ Challenge Completed!</span>';
+                    if (resetRow) resetRow.classList.remove('visible');
+                    if (todayDot) {
+                        todayDot.className = 'day-dot today done';
+                        todayDot.innerHTML = '✓';
+                    }
+                } else if (isAccepted) {
+                    ctaBtn.className = 'locket-cta-btn accepted';
+                    ctaBtn.innerHTML = '<span>Mark Completed</span>';
+                    if (resetRow) resetRow.classList.add('visible');
+                    if (todayDot) {
+                        todayDot.className = 'day-dot today in-progress';
+                        todayDot.innerHTML = '•';
+                    }
+                } else {
+                    ctaBtn.className = 'locket-cta-btn';
+                    ctaBtn.innerHTML = '<span>I’m In! Take Challenge</span><span>→</span>';
+                    if (resetRow) resetRow.classList.remove('visible');
+                    if (todayDot) {
+                        todayDot.className = 'day-dot today';
+                        todayDot.innerHTML = '';
+                    }
                 }
             }
         }
@@ -4965,16 +5045,14 @@
             const canvas = document.getElementById('desktopLogoCrystalCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Draw a simplified tiny brand crystal representing the letter "a"
-            ctx.fillStyle = currentTheme === 'dark' ? '#D4FF4D' : '#FF4B2B'; // Volt or Ember
-            ctx.beginPath();
-            ctx.moveTo(9, 2);
-            ctx.lineTo(15, 9);
-            ctx.lineTo(9, 16);
-            ctx.lineTo(3, 9);
-            ctx.closePath();
-            ctx.fill();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = 18 * dpr;
+            canvas.height = 18 * dpr;
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, 18, 18);
+            
+            // Draw the premium procedural 3D coarse salt crystal representing the letter "a"
+            drawSaltCrystal(ctx, 9, 9, 15, -0.12, 1.0);
         }
 
         let communityStatsListener = null;
@@ -5287,38 +5365,43 @@
         function handleCtaInteraction() {
             const btn = document.getElementById('ctaBtn');
             const counterEl = document.getElementById('counterNumber');
-            const todayDot = document.getElementById('day-1'); // ═════════════════════════════════════════════════════════
-// Monday = today
+            const todayDot = document.getElementById('day-1');
             const resetRow = document.getElementById('resetTimerRow');
 
             if (!isAccepted) {
-                // ═════════════════════════════════════════════════════════
-// STAGE 1: ACCEPTED
                 isAccepted = true;
                 playPopSound();
                 awardWisdomPoints(20, 'accept');
 
-                // ═════════════════════════════════════════════════════════
-// Animate companion to reflective focus
+                // Persist State 1: Accepted
+                let profileData = JSON.parse(localStorage.getItem('salt_user_profile') || '{}');
+                profileData.isAccepted = true;
+                profileData.isCompleted = false;
+                localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
+
+                if (useFirebase && authObj.currentUser) {
+                    firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
+                        isAccepted: true,
+                        isCompleted: false
+                    }).catch(err => console.error("Firebase update failed: ", err));
+                }
+
+                // Animate companion to reflective focus
                 triggerCompanionStateTemp('reflective', 3000);
 
-                // ═════════════════════════════════════════════════════════
-// Button moves to accepted/commitment state (gray layout)
+                // Button moves to accepted/commitment state (gray layout)
                 btn.classList.add('accepted');
                 btn.innerHTML = '<span>Mark Completed</span>';
 
-                // ═════════════════════════════════════════════════════════
-// Week row dot displays commit dot (Ember in-progress dot)
+                // Week row dot displays commit dot (Ember in-progress dot)
                 todayDot.classList.add('in-progress');
                 todayDot.innerHTML = '•';
 
-                // ═════════════════════════════════════════════════════════
-// Reveal clock resets countdown
+                // Reveal clock resets countdown
                 resetRow.classList.add('visible');
                 document.getElementById('resetTimerDisplay').innerText = formatTime(secondsLeft);
 
-                // ═════════════════════════════════════════════════════════
-// Schedule simulated push notification reminder in 7 seconds if not finished
+                // Schedule simulated push notification reminder in 7 seconds if not finished
                 if (pushReminderTimeout) clearTimeout(pushReminderTimeout);
                 pushReminderTimeout = setTimeout(() => {
                     if (isAccepted && !isCompleted) {
@@ -5327,52 +5410,110 @@
                 }, 7000);
             } 
             else if (isAccepted && !isCompleted) {
-                // ═════════════════════════════════════════════════════════
-// STAGE 2: COMPLETED
                 isCompleted = true;
                 awardWisdomPoints(40, 'complete');
+
+                // Persist State 2: Completed
+                const todayStr = getTodayDateString();
+                let profileData = JSON.parse(localStorage.getItem('salt_user_profile') || '{}');
+                profileData.isAccepted = true;
+                profileData.isCompleted = true;
                 
-                // ═════════════════════════════════════════════════════════
-// Clear reminder timer
+                if (!profileData.completions) profileData.completions = [];
+                let addedNew = false;
+                if (!profileData.completions.includes(todayStr)) {
+                    profileData.completions.push(todayStr);
+                    profileData.completed = (profileData.completed || 0) + 1;
+                    addedNew = true;
+                }
+                
+                // Calculate streak
+                profileData = checkAndUpdateStreak(profileData, profileData.completions);
+                localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
+
+                // Sync stats to Profile View
+                const streakVal = document.querySelector('#viewProfile .stat-item:nth-child(1) .stat-val');
+                const completedVal = document.querySelector('#viewProfile .stat-item:nth-child(2) .stat-val');
+                if (streakVal) streakVal.innerText = (profileData.streak || 0) + ' Days';
+                if (completedVal) completedVal.innerText = profileData.completed || 0;
+
+                // Sync streak pill in header
+                const streakPill = document.querySelector('.streak-pill');
+                if (streakPill) {
+                    const isGuest = !isLoggedIn || (profileData && profileData.email === 'guest@salt.app');
+                    if (!isGuest) {
+                        streakPill.innerHTML = `
+                            <svg width="12" height="15" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <filter id="boltGlow" x="-30%" y="-20%" width="160%" height="160%">
+                                        <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#D4FF4D" flood-opacity="0.7"/>
+                                    </filter>
+                                </defs>
+                                <path d="M15 1L4 16h9l-3 11L22 12h-9z" fill="var(--volt)" filter="url(#boltGlow)"/>
+                                <path d="M15 1L9 10.5h4.5L12 16l5.5-8H13z" fill="rgba(255,255,255,0.35)"/>
+                            </svg>
+                            ${profileData.streak || 0} Days
+                        `;
+                    }
+                }
+                
+                // Sync streak in desktop sidebar
+                const dStreakEl = document.querySelector('.d-streak-count-text');
+                if (dStreakEl) {
+                    dStreakEl.innerText = `${profileData.streak || 0} Days`;
+                }
+
+                if (useFirebase && authObj.currentUser) {
+                    firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
+                        isAccepted: true,
+                        isCompleted: true,
+                        completions: firebase.firestore.FieldValue.arrayUnion(todayStr),
+                        completed: profileData.completed,
+                        streak: profileData.streak,
+                        longestStreak: profileData.longestStreak || 0
+                    }).catch(err => console.error("Firebase update failed: ", err));
+
+                    if (addedNew) {
+                        firestoreDb.collection("stats").doc(todayStr).update({
+                            completionsCount: firebase.firestore.FieldValue.increment(1)
+                        }).catch(() => {
+                            firestoreDb.collection("stats").doc(todayStr).set({ completionsCount: 1421 });
+                        });
+                    }
+                }
+                
+                // Clear reminder timer
                 if (pushReminderTimeout) clearTimeout(pushReminderTimeout);
                 closePushNotification();
                 const badge = document.getElementById('stickyBadge');
                 if (badge) badge.style.display = 'none';
 
-                // ═════════════════════════════════════════════════════════
-// Play completion chimes (higher frequency burst)
+                // Play completion chimes (higher frequency burst)
                 playTabTickSound();
                 setTimeout(playPopSound, 100);
 
-                // ═════════════════════════════════════════════════════════
-// Confetti blast
+                // Confetti blast
                 triggerConfettiBurst();
 
-                // ═════════════════════════════════════════════════════════
-// Animate companion state to celebrating!
+                // Animate companion state to celebrating!
                 triggerCompanionStateTemp('celebrating', 4000);
-            awardWisdomPoints(30, 'gist');
+                awardWisdomPoints(30, 'gist');
 
-                // ═════════════════════════════════════════════════════════
-// CTA transforms to Volt Success State
+                // CTA transforms to Volt Success State
                 btn.classList.remove('accepted');
                 btn.classList.add('completed');
                 btn.innerHTML = '<span>✓ Challenge Completed!</span>';
 
-                // ═════════════════════════════════════════════════════════
-// Update participant counter with spring animation
-                counterEl.innerHTML = '1,421 believers';
+                // Update participant counter with spring animation
                 counterEl.classList.add('counter-pop');
                 setTimeout(() => counterEl.classList.remove('counter-pop'), 400);
 
-                // ═════════════════════════════════════════════════════════
-// Week row dot becomes Volt green check
+                // Week row dot becomes Volt green check
                 todayDot.classList.remove('in-progress');
                 todayDot.classList.add('done');
                 todayDot.innerHTML = '✓';
 
-                // ═════════════════════════════════════════════════════════
-// Nudge bottom sheet slides up after short delay
+                // Nudge bottom sheet slides up after short delay
                 setTimeout(openNudgeSheet, 600);
             }
         }
@@ -6713,31 +6854,27 @@
             }
         }
 
-        function updateMockNotifTime(val) {
+        function updateReminderPreviewTime(val) {
             if (!val) return;
-            const mockTime = document.getElementById('mockNotifTime');
-            // ═════════════════════════════════════════════════════════
-// Format 24h string to 12h
+            const timeEl = document.getElementById('reminderPreviewTime');
             const parts = val.split(':');
             let hrs = parseInt(parts[0]);
             const mins = parts[1];
             const ampm = hrs >= 12 ? 'PM' : 'AM';
             hrs = hrs % 12;
             hrs = hrs ? hrs : 12;
-            mockTime.innerText = `${hrs}:${mins} ${ampm}`;
+            timeEl.innerText = `${hrs}:${mins} ${ampm}`;
         }
 
-        // ═════════════════════════════════════════════════════════
-// Live inputs syncing to mock profile card
-        function updateMockProfileName(val) {
-            document.getElementById('mockProfileName').innerText = val.trim() || 'Your Name';
-            document.getElementById('mockProfileAvatar').innerText = (val.trim() || 'Y').substring(0, 2).toUpperCase();
+        // Live inputs syncing to profile preview card
+        function updateProfilePreviewName(val) {
+            document.getElementById('profilePreviewName').innerText = val.trim() || 'Your Name';
+            document.getElementById('profilePreviewAvatar').innerText = (val.trim() || 'Y').substring(0, 2).toUpperCase();
         }
 
-        // ═════════════════════════════════════════════════════════
-// Clean fallbacks for form inputs
-        function updateMockProfileBio(val) {
-            document.getElementById('mockProfileBio').innerText = val.trim() || 'Enter bio description below...';
+        // Clean fallbacks for form inputs
+        function updateProfilePreviewBio(val) {
+            document.getElementById('profilePreviewBio').innerText = val.trim() || 'Enter bio description below...';
         }
 
         // ═════════════════════════════════════════════════════════
@@ -6921,7 +7058,12 @@
                                 isCompleted: false,
                                 lastActiveDate: todayStr,
                                 createdAt: new Date().toISOString(),
-                                guardianId: selectedCompanionProfile
+                                guardianId: selectedCompanionProfile,
+                                guideLevel: parseInt(localStorage.getItem('salt_guide_level')) || 1,
+                                guideWp: parseInt(localStorage.getItem('salt_guide_wp')) || 0,
+                                actsSupported: parseInt(localStorage.getItem('salt_stats_acts_supported')) || 0,
+                                breadEaten: parseInt(localStorage.getItem('salt_stats_bread_eaten')) || 0,
+                                gistsShared: parseInt(localStorage.getItem('salt_stats_gists_shared')) || 0
                             };
                             return firestoreDb.collection("users").doc(user.uid).set(newProfile).then(() => {
                                 console.log("🔥 Firestore profile successfully compiled.");
@@ -7281,6 +7423,16 @@
             localStorage.setItem('salt_stats_acts_supported', progress.acts);
             localStorage.setItem('salt_stats_bread_eaten', progress.bread);
             localStorage.setItem('salt_stats_gists_shared', progress.gists);
+
+            if (useFirebase && authObj.currentUser) {
+                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
+                    guideLevel: progress.level,
+                    guideWp: progress.wp,
+                    actsSupported: progress.acts,
+                    breadEaten: progress.bread,
+                    gistsShared: progress.gists
+                }).catch(err => console.error("Firebase update failed: ", err));
+            }
 
             // Update Logbook Dashboard UI
             updateLogbookUi();
