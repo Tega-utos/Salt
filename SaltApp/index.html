@@ -7033,20 +7033,34 @@
                         return user.updateProfile({
                             displayName: name
                         }).then(() => {
-                            // Create Firestore user record
+                            // Migrate local guest state to Firebase
                             const todayStr = getTodayDateString();
+                            const guestProfile = JSON.parse(localStorage.getItem('salt_user_profile') || '{}');
+                            const completions = guestProfile.completions || [todayStr];
+                            const streak = guestProfile.streak !== undefined ? guestProfile.streak : 1;
+                            const longestStreak = guestProfile.longestStreak !== undefined ? guestProfile.longestStreak : 1;
+                            const completed = guestProfile.completed !== undefined ? guestProfile.completed : 1;
+                            const gists = guestProfile.gists !== undefined ? guestProfile.gists : 0;
+                            const isAccepted = guestProfile.isAccepted !== undefined ? guestProfile.isAccepted : false;
+                            const isCompleted = guestProfile.isCompleted !== undefined ? guestProfile.isCompleted : false;
+                            const reminderTime = document.getElementById('obReminderTime').value || guestProfile.reminderTime || '08:00';
+                            const goal = typeof obGoalSelected !== 'undefined' ? obGoalSelected : (guestProfile.focus || 'faith');
+                            const pace = typeof obPaceSelected !== 'undefined' ? obPaceSelected : (guestProfile.pace || 'active');
+
                             const newProfile = {
                                 name: name,
                                 email: email,
                                 bio: bio,
-                                reminderTime: '08:00',
-                                streak: 1,
-                                longestStreak: 1,
-                                completed: 1,
-                                gists: 0,
-                                completions: [todayStr],
-                                isAccepted: false,
-                                isCompleted: false,
+                                reminderTime: reminderTime,
+                                focus: goal,
+                                pace: pace,
+                                streak: streak,
+                                longestStreak: longestStreak,
+                                completed: completed,
+                                gists: gists,
+                                completions: completions,
+                                isAccepted: isAccepted,
+                                isCompleted: isCompleted,
                                 lastActiveDate: todayStr,
                                 createdAt: new Date().toISOString(),
                                 guardianId: selectedCompanionProfile,
