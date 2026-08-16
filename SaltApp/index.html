@@ -72,7 +72,8 @@
 
         /* 📱 RESPONSIVE VIEWPORT CONTAINER */
         .phone-viewport {
-            width: 100%;
+            flex: 1;
+            width: auto;
             height: 100%;
             background: var(--bg-base);
             border: none;
@@ -3062,7 +3063,7 @@
                 0 12px 28px rgba(0, 0, 0, 0.35);
         }
 
-        /* YOUVERSION-STYLE FULL-WIDTH EDGE-TO-EDGE TAB BAR */
+        /* FLOATING NAVIGATION DOCK */
         .modern-floating-dock {
             width: 100%;
             max-width: 480px;
@@ -3083,17 +3084,7 @@
             transform: translateX(-50%);
         }
 
-        /* On desktop: keep nav inside the phone frame */
-        @media (min-width: 600px) {
-            .modern-floating-dock {
-                position: absolute;
-                bottom: 0;
-                left: -16px;
-                width: calc(100% + 32px);
-                max-width: none;
-                transform: none;
-            }
-        }
+
 
         .modern-nav-item {
             flex: 1;
@@ -3113,7 +3104,7 @@
             transform: scale(0.90);
         }
 
-        /* NO background pill — YouVersion uses pure icon+label color change */
+        /* Active nav item background */
         .modern-nav-item.active {
             background: transparent;
         }
@@ -3152,7 +3143,7 @@
             font-weight: 700;
         }
 
-        /* NO dot indicator — YouVersion doesn't use one */
+        /* Dot indicator display rules */
         .active-dot-indicator { display: none; }
 
 
@@ -4252,23 +4243,23 @@
             </div><!-- End of profileDashboardContent -->
         </div><!-- End of viewProfile -->
 
-        <!-- 3. MODERN INSTAGRAM / YOUVERSION / iOS 18 FLOATING NAV DOCK -->
+        <!-- FLOATING NAVIGATION DOCK -->
         <div class="modern-floating-dock">
-            <!-- HOME TAB: Phosphor ph-house — familiar, Jakob's Law -->
+            <!-- HOME TAB -->
             <div class="modern-nav-item active" id="tabToday" onclick="switchNavTab('today')">
                 <i class="ph ph-house ph-nav icon-outline"></i>
                 <i class="ph-fill ph-house ph-nav icon-filled"></i>
                 <span class="modern-nav-label">Home</span>
             </div>
 
-            <!-- GIST TAB: Phosphor ph-chats — community conversation -->
+            <!-- GIST TAB -->
             <div class="modern-nav-item" id="tabGist" onclick="switchNavTab('gist')">
                 <i class="ph ph-chats ph-nav icon-outline"></i>
                 <i class="ph-fill ph-chats ph-nav icon-filled"></i>
                 <span class="modern-nav-label">Gist</span>
             </div>
 
-            <!-- PROFILE TAB: Phosphor ph-user-circle — refined identity -->
+            <!-- PROFILE TAB -->
             <div class="modern-nav-item" id="tabProfile" onclick="switchNavTab('profile')">
                 <i class="ph ph-user-circle ph-nav icon-outline"></i>
                 <i class="ph-fill ph-user-circle ph-nav icon-filled"></i>
@@ -4592,7 +4583,7 @@
         let isLoggedIn = localStorage.getItem('salt_logged_in') === 'true';
 
         // ═════════════════════════════════════════════════════════
-// WEB AUDIO HAPTIC TAB TICK
+        // Web Audio navigation tick trigger
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let soundEnabled = true;
 
@@ -7282,10 +7273,10 @@
 
         function getStreakCount() {
             const profileData = JSON.parse(localStorage.getItem('salt_user_profile'));
-            if (isLoggedIn && profileData) {
+            if (profileData) {
                 return profileData.streak || 0;
             }
-            return 14; // Default high streak in prototype
+            return 0;
         }
 
         function updateGuideStreakGlow() {
@@ -7768,6 +7759,12 @@
             if (!companionImages[profile]) return;
             selectedCompanionProfile = profile;
             localStorage.setItem('salt_companion_profile', profile);
+
+            if (useFirebase && authObj.currentUser) {
+                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
+                    guardianId: profile
+                }).catch(err => console.error("Firebase guardian update failed: ", err));
+            }
 
             // ═════════════════════════════════════════════════════════
 // Play light tactile pop sound
