@@ -2651,6 +2651,143 @@
             border-color: var(--volt);
         }
 
+        /* PREMIUM GUARDIAN SELECTION STYLES */
+        .guardian-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+            width: 100%;
+        }
+
+        .guardian-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 14px 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.25s ease;
+            position: relative;
+            width: 100%;
+            text-align: left;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .guardian-card:active {
+            transform: scale(0.98);
+        }
+
+        .guardian-card-avatar-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1.5px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            position: relative;
+        }
+
+        .guardian-card-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .guardian-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .guardian-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .guardian-card-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .guardian-card-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.35;
+        }
+
+        .guardian-card-check {
+            color: var(--volt);
+            font-size: 16px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .guardian-card.selected {
+            background: var(--volt-subtle);
+            border-color: var(--volt);
+            box-shadow: 0 0 15px rgba(212, 255, 77, 0.08);
+        }
+
+        .guardian-card.selected .guardian-card-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .guardian-card.selected .guardian-card-avatar {
+            animation: avatarBreathing 6s ease-in-out infinite;
+        }
+
+        @keyframes avatarBreathing {
+            0% { transform: scale(1.0); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1.0); }
+        }
+
+        @media (min-width: 768px) {
+            .guardian-options-list {
+                flex-direction: row;
+                gap: 12px;
+            }
+            .guardian-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 20px 12px;
+                flex: 1;
+                height: 100%;
+                justify-content: flex-start;
+            }
+            .guardian-card-avatar-wrapper {
+                width: 68px;
+                height: 68px;
+                margin-bottom: 4px;
+            }
+            .guardian-card-header {
+                justify-content: center;
+                gap: 4px;
+            }
+            .guardian-card-check {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+            }
+        }
+
         .onboarding-card-icon {
             width: 36px;
             height: 36px;
@@ -3313,10 +3450,10 @@
                 </div>
             </div>
 
-            <!-- SCREEN 2: GOAL SELECTOR -->
+            <!-- SCREEN 2: CHOOSE YOUR GUARDIAN -->
             <div class="onboarding-screen" id="obScreen-2">
-                <!-- Goal selection premium dynamic mesh background -->
-                <div class="splash-bg" id="obScreen2Bg">
+                <!-- Warm premium mesh background -->
+                <div class="splash-bg">
                     <div class="splash-mesh-orb splash-mesh-1"></div>
                     <div class="splash-mesh-orb splash-mesh-2"></div>
                     <div class="splash-mesh-orb splash-mesh-3"></div>
@@ -3327,15 +3464,95 @@
                         <button onclick="prevObScreen(2)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
                             <i class="ph ph-arrow-left"></i> Back
                         </button>
-                        <button onclick="finishOnboardingQuiz()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
+                        <span style="font-family: 'Bricolage Grotesque'; font-size: 16px; font-weight: 800; color: #FAFAF7; letter-spacing: -0.5px; opacity: 0.8;">salt</span>
+                        <button onclick="skipProfileSetup()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
+                            Skip
+                        </button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; flex: 1; justify-content: center; z-index: 2; position: relative; width: 100%;">
+                        <div class="onboarding-header" style="margin-top:0;">
+                            <h2 class="onboarding-title">Choose your Guardian</h2>
+                            <p class="onboarding-subtitle">Select the companion who will walk with you in your daily rituals.</p>
+                        </div>
+
+                        <div class="guardian-options-list">
+                            <!-- Card 1: Blended -->
+                            <div class="guardian-card selected" id="obGuardCard-mixed" onclick="selectObGuardian('mixed')">
+                                <div class="guardian-card-avatar-wrapper">
+                                    <img src="character_calm_mixed_1786645967568.jpg" class="guardian-card-avatar" alt="Blended Guide" />
+                                </div>
+                                <div class="guardian-card-content">
+                                    <div class="guardian-card-header">
+                                        <div class="guardian-card-name">Blended Guide</div>
+                                        <span class="guardian-card-check"><i class="ph-fill ph-check-circle"></i></span>
+                                    </div>
+                                    <div class="guardian-card-desc">A warm companion, joyful, energetic, and encouraging.</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Sage -->
+                            <div class="guardian-card" id="obGuardCard-beige" onclick="selectObGuardian('beige')">
+                                <div class="guardian-card-avatar-wrapper">
+                                    <img src="character_calm_1786645561075.jpg" class="guardian-card-avatar" alt="Sage Guide" />
+                                </div>
+                                <div class="guardian-card-content">
+                                    <div class="guardian-card-header">
+                                        <div class="guardian-card-name">Sage Guide</div>
+                                        <span class="guardian-card-check"><i class="ph-fill ph-check-circle"></i></span>
+                                    </div>
+                                    <div class="guardian-card-desc">A thoughtful mentor, quiet, calm, and reflective.</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Guardian -->
+                            <div class="guardian-card" id="obGuardCard-grey" onclick="selectObGuardian('grey')">
+                                <div class="guardian-card-avatar-wrapper">
+                                    <img src="character_calm_black_1786645802710.jpg" class="guardian-card-avatar" alt="Guardian Guide" />
+                                </div>
+                                <div class="guardian-card-content">
+                                    <div class="guardian-card-header">
+                                        <div class="guardian-card-name">Guardian Guide</div>
+                                        <span class="guardian-card-check"><i class="ph-fill ph-check-circle"></i></span>
+                                    </div>
+                                    <div class="guardian-card-desc">A resilient shield, silent, strong, and protective.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="z-index: 5; position: relative; width: 100%; margin-top: 10px;">
+                        <button class="locket-cta-btn" onclick="nextObScreen(2)" style="width: 100%;">
+                            <span>Continue</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: GOAL SELECTOR -->
+            <div class="onboarding-screen" id="obScreen-3">
+                <!-- Goal selection premium dynamic mesh background -->
+                <div class="splash-bg" id="obScreen3Bg">
+                    <div class="splash-mesh-orb splash-mesh-1"></div>
+                    <div class="splash-mesh-orb splash-mesh-2"></div>
+                    <div class="splash-mesh-orb splash-mesh-3"></div>
+                </div>
+                
+                <div class="onboarding-content">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; z-index: 5; position: relative; margin-bottom: 8px;">
+                        <button onclick="prevObScreen(3)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
+                            <i class="ph ph-arrow-left"></i> Back
+                        </button>
+                        <button onclick="skipProfileSetup()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
                             Skip
                         </button>
                     </div>
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg2" class="mascot-avatar-img" data-companion-state="calm" src="character_calm_mixed_1786645967568.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
-                            <div class="mascot-bubble" id="obMascotBubble2">
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg3" class="mascot-avatar-img" data-companion-state="calm" src="character_calm_mixed_1786645967568.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-bubble" id="obMascotBubble3">
                                 Welcome! I'm Salty. What brings you to Salt today? Let's choose your main focus!
                             </div>
                         </div>
@@ -3382,15 +3599,15 @@
                             </div>
                         </div>
                     </div>
-                    <button class="locket-cta-btn" onclick="nextObScreen(2)">
+                    <button class="locket-cta-btn" onclick="nextObScreen(3)">
                         <span>Continue</span>
                         <span>→</span>
                     </button>
                 </div>
             </div>
 
-            <!-- SCREEN 3: COMMITMENT PACE -->
-            <div class="onboarding-screen" id="obScreen-3">
+            <!-- SCREEN 4: COMMITMENT PACE -->
+            <div class="onboarding-screen" id="obScreen-4">
                 <!-- Serene premium mesh background -->
                 <div class="splash-bg">
                     <div class="splash-mesh-orb splash-mesh-1"></div>
@@ -3400,18 +3617,18 @@
                 
                 <div class="onboarding-content">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; z-index: 5; position: relative; margin-bottom: 8px;">
-                        <button onclick="prevObScreen(3)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
+                        <button onclick="prevObScreen(4)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
                             <i class="ph ph-arrow-left"></i> Back
                         </button>
-                        <button onclick="finishOnboardingQuiz()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
+                        <button onclick="skipProfileSetup()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
                             Skip
                         </button>
                     </div>
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg3" class="mascot-avatar-img" data-companion-state="calm" src="character_calm_mixed_1786645967568.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
-                            <div class="mascot-bubble" id="obMascotBubble3">
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg4" class="mascot-avatar-img" data-companion-state="calm" src="character_calm_mixed_1786645967568.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-bubble" id="obMascotBubble4">
                                 Building habits works best when it's sustainable. How many times a week would you like to act?
                             </div>
                         </div>
@@ -3458,15 +3675,15 @@
                             </div>
                         </div>
                     </div>
-                    <button class="locket-cta-btn" onclick="nextObScreen(3)">
+                    <button class="locket-cta-btn" onclick="nextObScreen(4)">
                         <span>Continue</span>
                         <span>→</span>
                     </button>
                 </div>
             </div>
 
-            <!-- SCREEN 4: DAILY REMINDER TIME -->
-            <div class="onboarding-screen" id="obScreen-4">
+            <!-- SCREEN 5: DAILY REMINDER TIME -->
+            <div class="onboarding-screen" id="obScreen-5">
                 <!-- Warm premium mesh background -->
                 <div class="splash-bg">
                     <div class="splash-mesh-orb splash-mesh-1"></div>
@@ -3476,18 +3693,18 @@
                 
                 <div class="onboarding-content">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; z-index: 5; position: relative; margin-bottom: 8px;">
-                        <button onclick="prevObScreen(4)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
+                        <button onclick="prevObScreen(5)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
                             <i class="ph ph-arrow-left"></i> Back
                         </button>
-                        <button onclick="finishOnboardingQuiz()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
+                        <button onclick="skipProfileSetup()" style="background: none; border: none; color: var(--volt); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; z-index: 6;">
                             Skip
                         </button>
                     </div>
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg4" class="mascot-avatar-img" data-companion-state="calm" src="character_calm_mixed_1786645967568.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
-                            <div class="mascot-bubble" id="obMascotBubble4">
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg5" class="mascot-avatar-img" data-companion-state="calm" src="character_calm_mixed_1786645967568.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-bubble" id="obMascotBubble5">
                                 Nice choice! Let's schedule a daily nudge so you never forget to act out your faith.
                             </div>
                         </div>
@@ -3515,15 +3732,15 @@
                         <span style="display: block; font-size: 11px; color: rgba(250, 250, 247, 0.6); margin-top: 10px;">Change time to simulate reminder window</span>
                     </div>
 
-                    <button class="locket-cta-btn" onclick="nextObScreen(4)">
+                    <button class="locket-cta-btn" onclick="nextObScreen(5)">
                         <span>Turn on Reminders</span>
                         <span>→</span>
                     </button>
                 </div>
             </div>
 
-            <!-- SCREEN 5: STREAK PROFILE SIGNUP -->
-            <div class="onboarding-screen" id="obScreen-5">
+            <!-- SCREEN 6: STREAK PROFILE SIGNUP -->
+            <div class="onboarding-screen" id="obScreen-6">
                 <!-- Reflection premium mesh background -->
                 <div class="splash-bg">
                     <div class="splash-mesh-orb splash-mesh-1"></div>
@@ -3533,7 +3750,7 @@
                 
                 <div class="onboarding-content">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; z-index: 5; position: relative; margin-bottom: 8px;">
-                        <button onclick="prevObScreen(5)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
+                        <button onclick="prevObScreen(6)" style="background: none; border: none; color: rgba(250, 250, 247, 0.6); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; padding: 6px 0; gap: 4px; z-index: 6; font-family: 'Inter', sans-serif;">
                             <i class="ph ph-arrow-left"></i> Back
                         </button>
                         <div style="width: 50px;"></div>
@@ -3541,8 +3758,8 @@
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg5" class="mascot-avatar-img" data-companion-state="celebrating" src="character_celebrating_mixed_1786646016448.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
-                            <div class="mascot-bubble" id="obMascotBubble5">
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg6" class="mascot-avatar-img" data-companion-state="celebrating" src="character_celebrating_mixed_1786646016448.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-bubble" id="obMascotBubble6">
                                 We're almost there! Let's lock in your name, email, and password to form your streak profile.
                             </div>
                         </div>
@@ -4807,8 +5024,8 @@
             document.querySelectorAll('.onboarding-screen').forEach(screen => {
                 screen.classList.remove('active');
             });
-            const s5 = document.getElementById('obScreen-5');
-            if (s5) s5.classList.add('active');
+            const s6 = document.getElementById('obScreen-6');
+            if (s6) s6.classList.add('active');
             document.getElementById('obProgressBar').style.display = 'none';
         }
 
@@ -6312,10 +6529,18 @@
                     const pFill = document.getElementById('obProgressFill');
                     if (targetId === 'obScreen-6') {
                         pBar.style.display = 'none';
-                    } else if (targetId === 'obScreen-2') {
+                    } else if (targetId === 'obScreen-2' || targetId === 'obScreen-3' || targetId === 'obScreen-4' || targetId === 'obScreen-5') {
                         pBar.style.display = 'block';
-                        pFill.style.width  = '20%';
-                        selectObGuardian(selectedCompanionProfile);
+                        if (targetId === 'obScreen-2') {
+                            pFill.style.width = '20%';
+                            selectObGuardian(selectedCompanionProfile);
+                        } else if (targetId === 'obScreen-3') {
+                            pFill.style.width = '40%';
+                        } else if (targetId === 'obScreen-4') {
+                            pFill.style.width = '60%';
+                        } else if (targetId === 'obScreen-5') {
+                            pFill.style.width = '80%';
+                        }
                     } else {
                         pBar.style.display = 'none';
                     }
@@ -6359,16 +6584,16 @@
         function goToSignUpScreen() {
             playPopSound();
             document.getElementById('obScreen-1').classList.remove('active');
-            const s5 = document.getElementById('obScreen-5');
-            s5.classList.add('active', 'slide-in');
-            setTimeout(() => s5.classList.remove('slide-in'), 400);
+            const s6 = document.getElementById('obScreen-6');
+            s6.classList.add('active', 'slide-in');
+            setTimeout(() => s6.classList.remove('slide-in'), 400);
             
             document.getElementById('obProgressBar').style.display = 'none';
         }
 
         // ═════════════════════════════════════════════════════════
-// Direct slide transition from splash to goals (used internally after animation)
-        function goToGoalSelector() {
+// Direct slide transition from splash to Guardian selection
+        function goToGuardianSelector() {
             playPopSound();
             document.getElementById('obScreen-1').classList.remove('active');
             const s2 = document.getElementById('obScreen-2');
@@ -6376,7 +6601,21 @@
             setTimeout(() => s2.classList.remove('slide-in'), 400);
             
             document.getElementById('obProgressBar').style.display = 'block';
-            document.getElementById('obProgressFill').style.width = '25%';
+            document.getElementById('obProgressFill').style.width = '20%';
+            selectObGuardian(selectedCompanionProfile);
+        }
+
+        // ═════════════════════════════════════════════════════════
+// Direct slide transition from Guardian selector to goals
+        function goToGoalSelector() {
+            playPopSound();
+            document.getElementById('obScreen-2').classList.remove('active');
+            const s3 = document.getElementById('obScreen-3');
+            s3.classList.add('active', 'slide-in');
+            setTimeout(() => s3.classList.remove('slide-in'), 400);
+            
+            document.getElementById('obProgressBar').style.display = 'block';
+            document.getElementById('obProgressFill').style.width = '40%';
             updateLivePreview('kindness');
         }
 
@@ -6625,26 +6864,26 @@
             if (!data) return;
 
             // Update dialogue bubble text
-            const b2 = document.getElementById('obMascotBubble2');
             const b3 = document.getElementById('obMascotBubble3');
             const b4 = document.getElementById('obMascotBubble4');
             const b5 = document.getElementById('obMascotBubble5');
+            const b6 = document.getElementById('obMascotBubble6');
 
-            if (b2) b2.innerHTML = data.screen2;
-            if (b3) b3.innerHTML = data.screen3;
-            if (b4) b4.innerHTML = data.screen4;
-            if (b5) b5.innerHTML = data.screen5;
+            if (b3) b3.innerHTML = data.screen2;
+            if (b4) b4.innerHTML = data.screen3;
+            if (b5) b5.innerHTML = data.screen4;
+            if (b6) b6.innerHTML = data.screen5;
 
             // Update mascot images in onboarding
-            const mImg2 = document.getElementById('obMascotImg2');
             const mImg3 = document.getElementById('obMascotImg3');
             const mImg4 = document.getElementById('obMascotImg4');
             const mImg5 = document.getElementById('obMascotImg5');
+            const mImg6 = document.getElementById('obMascotImg6');
 
-            if (mImg2) mImg2.src = data.mascotImg;
             if (mImg3) mImg3.src = data.mascotImg;
             if (mImg4) mImg4.src = data.mascotImg;
-            if (mImg5) mImg5.src = data.mascotCelebratingImg;
+            if (mImg5) mImg5.src = data.mascotImg;
+            if (mImg6) mImg6.src = data.mascotCelebratingImg;
         }
 
 
