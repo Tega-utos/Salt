@@ -4653,11 +4653,8 @@
 
 
 
-    <!-- 🧪 FIREBASE CLIENT SDKS (v8 Compat for single-file deployment) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+    <!-- ⚡ SUPABASE CLIENT SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         // ═════════════════════════════════════════════════════════
@@ -4665,122 +4662,184 @@
         // ═════════════════════════════════════════════════════════
         // 🔥 FIREBASE INITIALIZATION & AUTOMATIC LOCAL FALLBACK
         // ═════════════════════════════════════════════════════════
-        // Replace these placeholder values with your actual Firebase project settings:
-        const firebaseConfig = {
-            apiKey: "AIzaSyCcSl5cmGeZrRxEY3r8IaThkz5MXoY5TKA",
-            authDomain: "salt-b8ed3.firebaseapp.com",
-            projectId: "salt-b8ed3",
-            storageBucket: "salt-b8ed3.firebasestorage.app",
-            messagingSenderId: "672712010690",
-            appId: "1:672712010690:web:39bcdc33ecef65d56f045b",
-            measurementId: "G-9Q7Z8P4SDL"
-        };
+        // Replace these placeholder values with your actual Supabase project settings:
+        const supabaseUrl = "https://nmkjmlmfihkuctvyceup.supabase.co";
+        const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ta2ptbG1maWhrdWN0dnljZXVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNTczOTYsImV4cCI6MjEwMjczMzM5Nn0.6UfUtaRDKoLJfT0JI6B1afkRbCBG2tdik2myBvbq50I";
 
-        let useFirebase = false;
+        let useSupabase = false;
+        let supabase = null;
         let authObj = null;
-        let firestoreDb = null;
 
-        // Auto-detect if user has configured Firebase
-        if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+        // Auto-detect if user has configured Supabase
+        if (supabaseUrl && supabaseUrl !== "YOUR_SUPABASE_URL" && supabaseAnonKey && supabaseAnonKey !== "YOUR_SUPABASE_ANON_KEY") {
             try {
-                firebase.initializeApp(firebaseConfig);
-                authObj = firebase.auth();
-                firestoreDb = firebase.firestore();
-                useFirebase = true;
-                if (typeof firebase.analytics === 'function') {
-                    firebase.analytics();
-                }
-                console.log("🔥 Firebase initialized successfully!");
+                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+                useSupabase = true;
+                console.log("⚡ Supabase initialized successfully!");
 
-                // Register real-time Firebase Auth state listener
-                authObj.onAuthStateChanged((user) => {
+                // Register real-time Supabase Auth state listener
+                supabase.auth.onAuthStateChange(async (event, session) => {
+                    const user = session?.user;
                     if (user) {
+                        authObj = {
+                            currentUser: {
+                                uid: user.id,
+                                email: user.email,
+                                displayName: user.user_metadata?.full_name || user.email.split('@')[0]
+                            }
+                        };
                         isLoggedIn = true;
                         localStorage.setItem('salt_logged_in', 'true');
                         
-                        // Load user profile from Firestore doc
-                        firestoreDb.collection("users").doc(user.uid).get().then((doc) => {
-                            let profileData;
-                            if (doc.exists) {
-                                profileData = doc.data();
-                                
-                                // Sync saved Guardian ID
-                                if (profileData.guardianId) {
-                                    selectedCompanionProfile = profileData.guardianId;
-                                    localStorage.setItem('salt_companion_profile', selectedCompanionProfile);
-                                    setCompanionProfile(selectedCompanionProfile);
-                                }
-                                
-                                // Sync saved Companion level & progression
-                                if (profileData.guideLevel !== undefined) {
-                                    localStorage.setItem('salt_guide_level', profileData.guideLevel);
-                                    localStorage.setItem('salt_guide_wp', profileData.guideWp || 0);
-                                    localStorage.setItem('salt_stats_acts_supported', profileData.actsSupported || 0);
-                                    localStorage.setItem('salt_stats_bread_eaten', profileData.breadEaten || 0);
-                                    localStorage.setItem('salt_stats_gists_shared', profileData.gistsShared || 0);
-                                }
-                                
-                                // Run streak calculation
-                                profileData = checkAndUpdateStreak(profileData, profileData.completions || []);
-                                // Sync back
-                                firestoreDb.collection("users").doc(user.uid).update({
-                                    streak: profileData.streak,
-                                    longestStreak: profileData.longestStreak || 0,
-                                    lastActiveTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                            } else {
-                                // Create new authenticated user profile doc in Firestore
-                                const localCompanion = localStorage.getItem('salt_companion_profile') || 'mixed';
-                                profileData = {
-                                    name: user.displayName || user.email.split('@')[0],
-                                    email: user.email,
-                                    bio: 'Building daily faith habits.',
-                                    reminderTime: '08:00',
-                                    streak: 1,
-                                    longestStreak: 1,
-                                    completed: 1,
-                                    gists: 0,
-                                    completions: [getTodayDateString()],
-                                    createdAt: new Date().toISOString(),
-                                    guardianId: localCompanion
-                                };
-                                firestoreDb.collection("users").doc(user.uid).set(profileData);
-                            }
-                            localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
-                            const isAdmin = user.email.toLowerCase() === 'teeutos@gmail.com';
-                            localStorage.setItem('salt_is_admin', isAdmin ? 'true' : 'false');
+                        // Load user profile from Supabase 'profiles' table
+                        const { data: profileData, error } = await supabase
+                            .from('profiles')
+                            .select('*')
+                            .eq('id', user.id)
+                            .maybeSingle();
+
+                        let finalProfile;
+                        if (profileData) {
+                            finalProfile = {
+                                name: profileData.name,
+                                email: profileData.email,
+                                bio: profileData.bio,
+                                reminderTime: profileData.reminder_time,
+                                streak: profileData.streak,
+                                longestStreak: profileData.longest_streak,
+                                completed: profileData.completed,
+                                gists: profileData.gists,
+                                completions: profileData.completions || [],
+                                isAccepted: profileData.is_accepted,
+                                isCompleted: profileData.is_completed,
+                                lastActiveDate: profileData.last_active_date,
+                                createdAt: profileData.created_at,
+                                guardianId: profileData.guardian_id,
+                                theme: profileData.theme,
+                                guideLevel: profileData.guide_level,
+                                guideWp: profileData.guide_wp,
+                                actsSupported: profileData.acts_supported,
+                                breadEaten: profileData.bread_eaten,
+                                gistsShared: profileData.gists_shared
+                            };
                             
-                            // Load theme if saved
-                            if (profileData.theme) {
-                                currentTheme = profileData.theme;
-                                document.documentElement.setAttribute('data-theme', currentTheme);
-                                drawHeaderLogo();
+                            // Sync saved Guardian ID
+                            if (finalProfile.guardianId) {
+                                selectedCompanionProfile = finalProfile.guardianId;
+                                localStorage.setItem('salt_companion_profile', selectedCompanionProfile);
+                                setCompanionProfile(selectedCompanionProfile);
                             }
                             
-                            // Initialize challenge states
-                            isAccepted = profileData.isAccepted || false;
-                            isCompleted = profileData.isCompleted || false;
-                            
-                            // Clear states if it's a new day
-                            const lastActiveDate = profileData.lastActiveDate || '';
-                            const todayStr = getTodayDateString();
-                            if (lastActiveDate !== todayStr) {
-                                isAccepted = false;
-                                isCompleted = false;
-                                firestoreDb.collection("users").doc(user.uid).update({
-                                    isAccepted: false,
-                                    isCompleted: false,
-                                    lastActiveDate: todayStr
-                                });
+                            // Sync saved Companion level & progression
+                            if (finalProfile.guideLevel !== undefined) {
+                                localStorage.setItem('salt_guide_level', finalProfile.guideLevel);
+                                localStorage.setItem('salt_guide_wp', finalProfile.guideWp || 0);
+                                localStorage.setItem('salt_stats_acts_supported', finalProfile.actsSupported || 0);
+                                localStorage.setItem('salt_stats_bread_eaten', finalProfile.breadEaten || 0);
+                                localStorage.setItem('salt_stats_gists_shared', finalProfile.gistsShared || 0);
                             }
                             
-                            updateAppAuthState();
-                            updateLogbookUi();
-                            syncSidebarState();
-                            updateWeeklyProgressRow(profileData.completions || []);
-                            listenToCommunityStats();
-                        });
+                            // Run streak calculation
+                            finalProfile = checkAndUpdateStreak(finalProfile, finalProfile.completions || []);
+                            // Sync back
+                            await supabase
+                                .from('profiles')
+                                .update({
+                                    streak: finalProfile.streak,
+                                    longest_streak: finalProfile.longestStreak || 0,
+                                    last_active_timestamp: new Date().toISOString()
+                                })
+                                .eq('id', user.id);
+                        } else {
+                            // Create new authenticated user profile doc in Supabase
+                            const localCompanion = localStorage.getItem('salt_companion_profile') || 'mixed';
+                            finalProfile = {
+                                name: user.user_metadata?.full_name || user.email.split('@')[0],
+                                email: user.email,
+                                bio: 'Building daily faith habits.',
+                                reminderTime: '08:00',
+                                streak: 1,
+                                longestStreak: 1,
+                                completed: 1,
+                                gists: 0,
+                                completions: [getTodayDateString()],
+                                createdAt: new Date().toISOString(),
+                                guardianId: localCompanion,
+                                theme: 'dark',
+                                guideLevel: 1,
+                                guideWp: 0,
+                                actsSupported: 0,
+                                breadEaten: 0,
+                                gistsShared: 0,
+                                isAccepted: false,
+                                isCompleted: false,
+                                lastActiveDate: getTodayDateString()
+                            };
+                            const dbProfile = {
+                                id: user.id,
+                                name: finalProfile.name,
+                                email: finalProfile.email,
+                                bio: finalProfile.bio,
+                                reminder_time: finalProfile.reminderTime,
+                                streak: finalProfile.streak,
+                                longest_streak: finalProfile.longestStreak,
+                                completed: finalProfile.completed,
+                                gists: finalProfile.gists,
+                                completions: finalProfile.completions,
+                                created_at: finalProfile.createdAt,
+                                guardian_id: finalProfile.guardianId,
+                                theme: finalProfile.theme,
+                                guide_level: finalProfile.guideLevel,
+                                guide_wp: finalProfile.guideWp,
+                                acts_supported: finalProfile.actsSupported,
+                                bread_eaten: finalProfile.breadEaten,
+                                gists_shared: finalProfile.gistsShared,
+                                is_accepted: finalProfile.isAccepted,
+                                is_completed: finalProfile.isCompleted,
+                                last_active_date: finalProfile.lastActiveDate,
+                                last_active_timestamp: new Date().toISOString()
+                            };
+                            await supabase.from('profiles').insert([dbProfile]);
+                        }
+                        
+                        localStorage.setItem('salt_user_profile', JSON.stringify(finalProfile));
+                        const isAdmin = user.email.toLowerCase() === 'teeutos@gmail.com';
+                        localStorage.setItem('salt_is_admin', isAdmin ? 'true' : 'false');
+                        
+                        // Load theme if saved
+                        if (finalProfile.theme) {
+                            currentTheme = finalProfile.theme;
+                            document.documentElement.setAttribute('data-theme', currentTheme);
+                            drawHeaderLogo();
+                        }
+                        
+                        // Initialize challenge states
+                        isAccepted = finalProfile.isAccepted || false;
+                        isCompleted = finalProfile.isCompleted || false;
+                        
+                        // Clear states if it's a new day
+                        const lastActiveDate = finalProfile.lastActiveDate || '';
+                        const todayStr = getTodayDateString();
+                        if (lastActiveDate !== todayStr) {
+                            isAccepted = false;
+                            isCompleted = false;
+                            await supabase
+                                .from('profiles')
+                                .update({
+                                    is_accepted: false,
+                                    is_completed: false,
+                                    last_active_date: todayStr
+                                })
+                                .eq('id', user.id);
+                        }
+                        
+                        updateAppAuthState();
+                        updateLogbookUi();
+                        syncSidebarState();
+                        updateWeeklyProgressRow(finalProfile.completions || []);
+                        listenToCommunityStats();
                     } else {
+                        authObj = null;
                         isLoggedIn = false;
                         localStorage.setItem('salt_logged_in', 'false');
                         localStorage.setItem('salt_is_admin', 'false');
@@ -4791,10 +4850,10 @@
                     }
                 });
             } catch (err) {
-                console.error("Firebase failed to initialize:", err);
+                console.error("Supabase failed to initialize:", err);
             }
         } else {
-            console.warn("⚠️ Firebase configuration keys are placeholders. Falling back to simulated LocalStorage Auth database.");
+            console.warn("⚠️ Supabase configuration keys are placeholders. Falling back to simulated LocalStorage Auth database.");
         }
 
         let isLoggedIn = localStorage.getItem('salt_logged_in') === 'true';
@@ -5079,13 +5138,13 @@
                 switchNavTab('today');
             };
 
-            if (useFirebase) {
-                authObj.signOut()
+            if (useSupabase) {
+                supabase.auth.signOut()
                     .then(() => {
                         performLogoutCleanup();
                     })
                     .catch((err) => {
-                        console.error("Firebase logout error:", err);
+                        console.error("Supabase logout error:", err);
                         performLogoutCleanup();
                     });
             } else {
@@ -5265,23 +5324,35 @@
 
         let communityStatsListener = null;
         function listenToCommunityStats() {
-            if (!useFirebase || communityStatsListener) return;
+            if (!useSupabase || communityStatsListener) return;
             
             const todayStr = getTodayDateString();
-            communityStatsListener = firestoreDb.collection("stats").doc(todayStr).onSnapshot((doc) => {
-                const counterEl = document.getElementById('counterNumber');
-                if (!counterEl) return;
-                
-                let count = 1420; // baseline fallback
-                if (doc.exists) {
-                    count = doc.data().completionsCount || 1420;
-                } else {
-                    // Set initial community statistics counter doc
-                    firestoreDb.collection("stats").doc(todayStr).set({ completionsCount: 1420 });
-                }
-                
-                counterEl.innerHTML = `${count.toLocaleString()} believers completed today`;
-            });
+            const counterEl = document.getElementById('counterNumber');
+            if (!counterEl) return;
+
+            // Fetch initial count
+            supabase
+                .from('community_stats')
+                .select('completions_count')
+                .eq('date', todayStr)
+                .maybeSingle()
+                .then(({ data }) => {
+                    const count = data?.completions_count || 1420;
+                    counterEl.innerHTML = `${count.toLocaleString()} believers completed today`;
+                });
+
+            // Subscribe to real-time updates
+            communityStatsListener = supabase
+                .channel('community-stats-changes')
+                .on(
+                    'postgres_changes',
+                    { event: 'UPDATE', schema: 'public', table: 'community_stats', filter: `date=eq.${todayStr}` },
+                    (payload) => {
+                        const count = payload.new?.completions_count || 1420;
+                        counterEl.innerHTML = `${count.toLocaleString()} believers completed today`;
+                    }
+                )
+                .subscribe();
         }
 
         let currentTheme = 'dark';
@@ -5300,11 +5371,11 @@
             
             localStorage.setItem('salt_theme', currentTheme);
             
-            // Persist to Firebase if authenticated
-            if (useFirebase && authObj.currentUser) {
-                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
+            // Persist to Supabase if authenticated
+            if (useSupabase && authObj && authObj.currentUser) {
+                supabase.from('profiles').update({
                     theme: currentTheme
-                });
+                }).eq('id', authObj.currentUser.uid).then(() => {});
             }
             
             drawHeaderLogo();
@@ -5587,11 +5658,11 @@
                 profileData.isCompleted = false;
                 localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
 
-                if (useFirebase && authObj.currentUser) {
-                    firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
-                        isAccepted: true,
-                        isCompleted: false
-                    }).catch(err => console.error("Firebase update failed: ", err));
+                if (useSupabase && authObj && authObj.currentUser) {
+                    supabase.from('profiles').update({
+                        is_accepted: true,
+                        is_completed: false
+                    }).eq('id', authObj.currentUser.uid).catch(err => console.error("Supabase update failed: ", err));
                 }
 
                 // Animate companion to reflective focus
@@ -5671,22 +5742,21 @@
                     dStreakEl.innerText = `${profileData.streak || 0} Days`;
                 }
 
-                if (useFirebase && authObj.currentUser) {
-                    firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
-                        isAccepted: true,
-                        isCompleted: true,
-                        completions: firebase.firestore.FieldValue.arrayUnion(todayStr),
+                if (useSupabase && authObj && authObj.currentUser) {
+                    const updatedCompletions = profileData.completions || [];
+                    if (!updatedCompletions.includes(todayStr)) updatedCompletions.push(todayStr);
+                    supabase.from('profiles').update({
+                        is_accepted: true,
+                        is_completed: true,
+                        completions: updatedCompletions,
                         completed: profileData.completed,
                         streak: profileData.streak,
-                        longestStreak: profileData.longestStreak || 0
-                    }).catch(err => console.error("Firebase update failed: ", err));
+                        longest_streak: profileData.longestStreak || 0
+                    }).eq('id', authObj.currentUser.uid).catch(err => console.error("Supabase update failed: ", err));
 
                     if (addedNew) {
-                        firestoreDb.collection("stats").doc(todayStr).update({
-                            completionsCount: firebase.firestore.FieldValue.increment(1)
-                        }).catch(() => {
-                            firestoreDb.collection("stats").doc(todayStr).set({ completionsCount: 1421 });
-                        });
+                        supabase.rpc('increment_completions', { date_str: todayStr })
+                            .catch(err => console.error("Supabase stats increment failed:", err));
                     }
                 }
                 
@@ -5979,12 +6049,12 @@
                 profileData.bio = newBio;
                 localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
                 
-                // Update Firebase
-                if (useFirebase && authObj.currentUser) {
-                    firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
+                // Update Supabase
+                if (useSupabase && authObj && authObj.currentUser) {
+                    supabase.from('profiles').update({
                         bio: newBio
-                    }).then(() => {
-                        console.log("Bio updated in Firestore!");
+                    }).eq('id', authObj.currentUser.uid).then(() => {
+                        console.log("Bio updated in Supabase!");
                     });
                 }
             }
@@ -6013,10 +6083,10 @@
             profileData.soundEnabled = checked;
             localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
             
-            if (useFirebase && authObj.currentUser) {
-                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
-                    soundEnabled: checked
-                });
+            if (useSupabase && authObj && authObj.currentUser) {
+                supabase.from('profiles').update({
+                    sound_enabled: checked
+                }).eq('id', authObj.currentUser.uid).then(() => {});
             }
         }
 
@@ -6028,10 +6098,10 @@
             profileData.pushEnabled = isPush;
             localStorage.setItem('salt_user_profile', JSON.stringify(profileData));
             
-            if (useFirebase && authObj.currentUser) {
-                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
-                    pushEnabled: isPush
-                });
+            if (useSupabase && authObj && authObj.currentUser) {
+                supabase.from('profiles').update({
+                    push_enabled: isPush
+                }).eq('id', authObj.currentUser.uid).then(() => {});
             }
         }
 
@@ -6769,6 +6839,42 @@
 
             if (hasError) return;
             
+            if (useSupabase) {
+                const loginBtn = document.querySelector('#viewOnboarding #obScreen-1B .locket-cta-btn') || document.querySelector('button[onclick="executeLogin()"]');
+                const btnText = loginBtn ? loginBtn.querySelector('span') : null;
+                const originalText = btnText ? btnText.innerText : 'Log In';
+                if (btnText) btnText.innerText = "Logging in...";
+                if (loginBtn) {
+                    loginBtn.style.opacity = "0.7";
+                    loginBtn.style.pointerEvents = "none";
+                }
+
+                supabase.auth.signInWithPassword({ email, password }).then(({ data, error }) => {
+                    if (error) {
+                        console.error("Supabase Login Error:", error);
+                        showInputError('loginPassword', error.message || 'Log in failed.');
+                        if (btnText) btnText.innerText = originalText;
+                        if (loginBtn) {
+                            loginBtn.style.opacity = "1";
+                            loginBtn.style.pointerEvents = "auto";
+                        }
+                        playPopSound();
+                    } else {
+                        // Fade and hide onboarding overlay
+                        const obView = document.getElementById('viewOnboarding');
+                        if (obView) {
+                            obView.style.opacity = '0';
+                            setTimeout(() => {
+                                obView.style.display = 'none';
+                                obView.style.transform = 'none';
+                            }, 300);
+                        }
+                        triggerConfettiBurst();
+                    }
+                });
+                return;
+            }
+
             const name = email.split('@')[0];
             const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
             
@@ -7256,7 +7362,7 @@
                 return;
             }
 
-            if (useFirebase) {
+            if (useSupabase) {
                 const signupBtn = document.getElementById('signUpSubmitBtn');
                 const btnText = signupBtn ? signupBtn.querySelector('span') : null;
                 const originalText = btnText ? btnText.innerText : 'Create Account';
@@ -7266,51 +7372,88 @@
                     signupBtn.style.pointerEvents = "none";
                 }
 
-                authObj.createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        return user.updateProfile({
-                            displayName: name
-                        }).then(() => {
-                            // Migrate local guest state to Firebase
-                            const todayStr = getTodayDateString();
-                            const guestProfile = JSON.parse(localStorage.getItem('salt_user_profile') || '{}');
-                            const completions = guestProfile.completions || [todayStr];
-                            const streak = guestProfile.streak !== undefined ? guestProfile.streak : 1;
-                            const longestStreak = guestProfile.longestStreak !== undefined ? guestProfile.longestStreak : 1;
-                            const completed = guestProfile.completed !== undefined ? guestProfile.completed : 1;
-                            const gists = guestProfile.gists !== undefined ? guestProfile.gists : 0;
-                            const isAccepted = guestProfile.isAccepted !== undefined ? guestProfile.isAccepted : false;
-                            const isCompleted = guestProfile.isCompleted !== undefined ? guestProfile.isCompleted : false;
-                            const reminderTime = document.getElementById('obReminderTime').value || guestProfile.reminderTime || '08:00';
-                            const goal = typeof obGoalSelected !== 'undefined' ? obGoalSelected : (guestProfile.focus || 'faith');
-                            const pace = typeof obPaceSelected !== 'undefined' ? obPaceSelected : (guestProfile.pace || 'active');
+                // Sign up using Supabase Auth
+                supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name
+                        }
+                    }
+                }).then(({ data, error }) => {
+                    if (error) {
+                        console.error("Supabase Signup Error:", error);
+                        showInputError('obEmail', error.message || 'Failed to create profile.');
+                        if (btnText) btnText.innerText = originalText;
+                        if (signupBtn) {
+                            signupBtn.style.opacity = "1";
+                            signupBtn.style.pointerEvents = "auto";
+                        }
+                        playPopSound();
+                    } else {
+                        const user = data.user;
+                        if (!user) {
+                            showInputError('obEmail', 'Signup succeeded, but user object is missing.');
+                            if (btnText) btnText.innerText = originalText;
+                            if (signupBtn) {
+                                signupBtn.style.opacity = "1";
+                                signupBtn.style.pointerEvents = "auto";
+                            }
+                            return;
+                        }
+                        
+                        // Migrate local guest state to Supabase 'profiles' table
+                        const todayStr = getTodayDateString();
+                        const guestProfile = JSON.parse(localStorage.getItem('salt_user_profile') || '{}');
+                        const completions = guestProfile.completions || [todayStr];
+                        const streak = guestProfile.streak !== undefined ? guestProfile.streak : 1;
+                        const longestStreak = guestProfile.longestStreak !== undefined ? guestProfile.longestStreak : 1;
+                        const completed = guestProfile.completed !== undefined ? guestProfile.completed : 1;
+                        const gists = guestProfile.gists !== undefined ? guestProfile.gists : 0;
+                        const isAccepted = guestProfile.isAccepted !== undefined ? guestProfile.isAccepted : false;
+                        const isCompleted = guestProfile.isCompleted !== undefined ? guestProfile.isCompleted : false;
+                        const reminderTime = document.getElementById('obReminderTime').value || guestProfile.reminderTime || '08:00';
+                        const goal = typeof obGoalSelected !== 'undefined' ? obGoalSelected : (guestProfile.focus || 'faith');
+                        const pace = typeof obPaceSelected !== 'undefined' ? obPaceSelected : (guestProfile.pace || 'active');
 
-                            const newProfile = {
-                                name: name,
-                                email: email,
-                                bio: bio,
-                                reminderTime: reminderTime,
-                                focus: goal,
-                                pace: pace,
-                                streak: streak,
-                                longestStreak: longestStreak,
-                                completed: completed,
-                                gists: gists,
-                                completions: completions,
-                                isAccepted: isAccepted,
-                                isCompleted: isCompleted,
-                                lastActiveDate: todayStr,
-                                createdAt: new Date().toISOString(),
-                                guardianId: selectedCompanionProfile,
-                                guideLevel: parseInt(localStorage.getItem('salt_guide_level')) || 1,
-                                guideWp: parseInt(localStorage.getItem('salt_guide_wp')) || 0,
-                                actsSupported: parseInt(localStorage.getItem('salt_stats_acts_supported')) || 0,
-                                breadEaten: parseInt(localStorage.getItem('salt_stats_bread_eaten')) || 0,
-                                gistsShared: parseInt(localStorage.getItem('salt_stats_gists_shared')) || 0
-                            };
-                            return firestoreDb.collection("users").doc(user.uid).set(newProfile).then(() => {
-                                console.log("🔥 Firestore profile successfully compiled.");
+                        const dbProfile = {
+                            id: user.id,
+                            name: name,
+                            email: email,
+                            bio: bio,
+                            reminder_time: reminderTime,
+                            focus: goal,
+                            pace: pace,
+                            streak: streak,
+                            longest_streak: longestStreak,
+                            completed: completed,
+                            gists: gists,
+                            completions: completions,
+                            is_accepted: isAccepted,
+                            is_completed: isCompleted,
+                            last_active_date: todayStr,
+                            created_at: new Date().toISOString(),
+                            guardian_id: selectedCompanionProfile,
+                            guide_level: parseInt(localStorage.getItem('salt_guide_level')) || 1,
+                            guide_wp: parseInt(localStorage.getItem('salt_guide_wp')) || 0,
+                            acts_supported: parseInt(localStorage.getItem('salt_stats_acts_supported')) || 0,
+                            bread_eaten: parseInt(localStorage.getItem('salt_stats_bread_eaten')) || 0,
+                            gists_shared: parseInt(localStorage.getItem('salt_stats_gists_shared')) || 0,
+                            last_active_timestamp: new Date().toISOString()
+                        };
+
+                        supabase.from('profiles').insert([dbProfile]).then(({ error: insertError }) => {
+                            if (insertError) {
+                                console.error("Supabase Profile Insert Error:", insertError);
+                                showInputError('obEmail', 'Account created but failed to initialize profile: ' + insertError.message);
+                                if (btnText) btnText.innerText = originalText;
+                                if (signupBtn) {
+                                    signupBtn.style.opacity = "1";
+                                    signupBtn.style.pointerEvents = "auto";
+                                }
+                            } else {
+                                console.log("⚡ Supabase profile successfully compiled.");
                                 localStorage.setItem('salt_onboarding_completed', 'true');
                                 
                                 const obOverlay = document.getElementById('viewOnboarding');
@@ -7325,18 +7468,10 @@
                                 playTabTickSound();
                                 setTimeout(playPopSound, 100);
                                 triggerConfettiBurst();
-                            });
+                            }
                         });
-                    })
-                    .catch((err) => {
-                        console.error("Firebase Signup Error:", err);
-                        showInputError('obEmail', err.message || 'Failed to create profile.');
-                        if (btnText) btnText.innerText = originalText;
-                        if (signupBtn) {
-                            signupBtn.style.opacity = "1";
-                            signupBtn.style.pointerEvents = "auto";
-                        }
-                    });
+                    }
+                });
             } else {
                 isLoggedIn = true;
                 localStorage.setItem('salt_logged_in', 'true');
@@ -7668,14 +7803,14 @@
             localStorage.setItem('salt_stats_bread_eaten', progress.bread);
             localStorage.setItem('salt_stats_gists_shared', progress.gists);
 
-            if (useFirebase && authObj.currentUser) {
-                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
-                    guideLevel: progress.level,
-                    guideWp: progress.wp,
-                    actsSupported: progress.acts,
-                    breadEaten: progress.bread,
-                    gistsShared: progress.gists
-                }).catch(err => console.error("Firebase update failed: ", err));
+            if (useSupabase && authObj && authObj.currentUser) {
+                supabase.from('profiles').update({
+                    guide_level: progress.level,
+                    guide_wp: progress.wp,
+                    acts_supported: progress.acts,
+                    bread_eaten: progress.bread,
+                    gists_shared: progress.gists
+                }).eq('id', authObj.currentUser.uid).catch(err => console.error("Supabase update failed: ", err));
             }
 
             // Update Logbook Dashboard UI
@@ -8013,10 +8148,10 @@
             selectedCompanionProfile = profile;
             localStorage.setItem('salt_companion_profile', profile);
 
-            if (useFirebase && authObj.currentUser) {
-                firestoreDb.collection("users").doc(authObj.currentUser.uid).update({
-                    guardianId: profile
-                }).catch(err => console.error("Firebase guardian update failed: ", err));
+            if (useSupabase && authObj && authObj.currentUser) {
+                supabase.from('profiles').update({
+                    guardian_id: profile
+                }).eq('id', authObj.currentUser.uid).catch(err => console.error("Supabase guardian update failed: ", err));
             }
 
             // ═════════════════════════════════════════════════════════
@@ -8249,107 +8384,109 @@
         }
 
         // ═════════════════════════════════════════════════════════
-// Dynamic post submission helper inside Gist feed list
-        // ═════════════════════════════════════════════════════════
-        // 🔥 FIRESTORE REAL-TIME MULTIPLAYER GIST FEEDS
+// ⚡ SUPABASE REAL-TIME MULTIPLAYER GIST FEEDS
         // ═════════════════════════════════════════════════════════
         function listenToGists() {
-            if (!useFirebase) return;
-            
-            firestoreDb.collection("gists").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
-                const feedList = document.getElementById('gistFeedList');
-                if (!feedList) return;
-                
-                feedList.innerHTML = '';
-                
-                snapshot.forEach((doc) => {
-                    const gist = doc.data();
-                    const gistId = doc.id;
-                    const reactions = gist.reactions || { praying: 0, flame: 0, heart: 0, clapping: 0 };
-                    
-                    const postMarkup = `
-                        <div class="gist-item-card" id="gist-post-${gistId}">
-                            <div class="user-row">
-                                <div class="avatar-circle">${gist.userInitials || 'UO'}</div>
-                                <div>
-                                    <div class="user-name">${gist.userName || 'Anonymous User'}</div>
-                                    <div class="user-time">${gist.createdAt ? 'Active' : 'Just now'}</div>
-                                </div>
-                            </div>
-                            ${gist.title ? `<div class="gist-title" style="margin-top:10px; font-weight:800; color:#FAFAF7;">${gist.title}</div>` : ''}
-                            <div class="gist-body" style="margin-top:6px;">${gist.body}</div>
-                            
-                            ${gist.image ? `
-                            <div style="margin-top:10px; border-radius:12px; overflow:hidden; border:1px solid var(--border);">
-                                <img src="${gist.image}" style="width:100%; max-height:180px; object-fit:cover; display:block;" />
-                            </div>
-                            ` : ''}
+            if (!useSupabase) return;
 
-                            ${isModModeActive ? `<div class="gist-mod-delete" onclick="deleteFirebaseGist('${gistId}')"><i class="ph ph-trash"></i></div>` : ''}
-                            <div class="reaction-row" style="position:relative; margin-top:12px;">
-                                <div class="reaction-pill" onclick="toggleFirebaseReaction('${gistId}', 'praying')">
-                                    <i class="ph ph-hands-praying" style="font-size:12px;"></i>
-                                    <span class="reaction-count">${reactions.praying || 0}</span>
-                                </div>
-                                <div class="reaction-pill" onclick="toggleFirebaseReaction('${gistId}', 'flame')">
-                                    <i class="ph ph-flame" style="font-size:12px;"></i>
-                                    <span class="reaction-count">${reactions.flame || 0}</span>
-                                </div>
-                                <div class="reaction-pill" onclick="toggleFirebaseReaction('${gistId}', 'heart')">
-                                    <i class="ph ph-heart" style="font-size:12px;"></i>
-                                    <span class="reaction-count">${reactions.heart || 0}</span>
-                                </div>
-                                <div class="reaction-add-btn" onclick="toggleEmojiPicker(this)" title="Add reaction">+</div>
-                                <div class="emoji-picker">
-                                    <span class="emoji-opt" onclick="addFirebaseEmoji(this,'${gistId}','praying')"><i class="ph ph-hands-praying"></i></span>
-                                    <span class="emoji-opt" onclick="addFirebaseEmoji(this,'${gistId}','flame')"><i class="ph ph-flame"></i></span>
-                                    <span class="emoji-opt" onclick="addFirebaseEmoji(this,'${gistId}','heart')"><i class="ph ph-heart"></i></span>
-                                    <span class="emoji-opt" onclick="addFirebaseEmoji(this,'${gistId}','clapping')"><i class="ph ph-hands-clapping"></i></span>
-                                </div>
-                            </div>
+            const feedList = document.getElementById('gistFeedList');
+            if (!feedList) return;
+
+            // Initial load
+            supabase
+                .from('gists')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .then(({ data: gists, error }) => {
+                    if (error) { console.error("Supabase gists fetch error:", error); return; }
+                    feedList.innerHTML = '';
+                    (gists || []).forEach(gist => feedList.insertAdjacentHTML('beforeend', buildGistMarkup(gist)));
+                });
+
+            // Real-time subscription
+            supabase
+                .channel('gists-realtime')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'gists' }, (payload) => {
+                    feedList.insertAdjacentHTML('afterbegin', buildGistMarkup(payload.new));
+                })
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'gists' }, (payload) => {
+                    const card = document.getElementById(`gist-post-${payload.old.id}`);
+                    if (card) card.remove();
+                })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gists' }, (payload) => {
+                    const card = document.getElementById(`gist-post-${payload.new.id}`);
+                    if (card) card.outerHTML = buildGistMarkup(payload.new);
+                })
+                .subscribe();
+        }
+
+        function buildGistMarkup(gist) {
+            const reactions = gist.reactions || { praying: 0, flame: 0, heart: 0, clapping: 0 };
+            const gistId = gist.id;
+            const timeStr = gist.created_at ? new Date(gist.created_at).toLocaleDateString() : 'Just now';
+            return `
+                <div class="gist-item-card" id="gist-post-${gistId}">
+                    <div class="user-row">
+                        <div class="avatar-circle">${gist.user_initials || 'UO'}</div>
+                        <div>
+                            <div class="user-name">${gist.user_name || 'Anonymous User'}</div>
+                            <div class="user-time">${timeStr}</div>
                         </div>
-                    `;
-                    feedList.insertAdjacentHTML('beforeend', postMarkup);
-                });
-            }, (error) => {
-                console.error("Firestore snapshot error:", error);
-            });
+                    </div>
+                    ${gist.title ? `<div class="gist-title" style="margin-top:10px; font-weight:800; color:#FAFAF7;">${gist.title}</div>` : ''}
+                    <div class="gist-body" style="margin-top:6px;">${gist.body}</div>
+                    ${gist.image ? `<div style="margin-top:10px; border-radius:12px; overflow:hidden; border:1px solid var(--border);"><img src="${gist.image}" style="width:100%; max-height:180px; object-fit:cover; display:block;" /></div>` : ''}
+                    ${isModModeActive ? `<div class="gist-mod-delete" onclick="deleteSupabaseGist('${gistId}')"><i class="ph ph-trash"></i></div>` : ''}
+                    <div class="reaction-row" style="position:relative; margin-top:12px;">
+                        <div class="reaction-pill" onclick="toggleSupabaseReaction('${gistId}', 'praying')">
+                            <i class="ph ph-hands-praying" style="font-size:12px;"></i>
+                            <span class="reaction-count">${reactions.praying || 0}</span>
+                        </div>
+                        <div class="reaction-pill" onclick="toggleSupabaseReaction('${gistId}', 'flame')">
+                            <i class="ph ph-flame" style="font-size:12px;"></i>
+                            <span class="reaction-count">${reactions.flame || 0}</span>
+                        </div>
+                        <div class="reaction-pill" onclick="toggleSupabaseReaction('${gistId}', 'heart')">
+                            <i class="ph ph-heart" style="font-size:12px;"></i>
+                            <span class="reaction-count">${reactions.heart || 0}</span>
+                        </div>
+                        <div class="reaction-add-btn" onclick="toggleEmojiPicker(this)" title="Add reaction">+</div>
+                        <div class="emoji-picker">
+                            <span class="emoji-opt" onclick="addSupabaseEmoji(this,'${gistId}','praying')"><i class="ph ph-hands-praying"></i></span>
+                            <span class="emoji-opt" onclick="addSupabaseEmoji(this,'${gistId}','flame')"><i class="ph ph-flame"></i></span>
+                            <span class="emoji-opt" onclick="addSupabaseEmoji(this,'${gistId}','heart')"><i class="ph ph-heart"></i></span>
+                            <span class="emoji-opt" onclick="addSupabaseEmoji(this,'${gistId}','clapping')"><i class="ph ph-hands-clapping"></i></span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
-        function toggleFirebaseReaction(gistId, reactionType) {
-            if (!useFirebase) return;
-            const ref = firestoreDb.collection("gists").doc(gistId);
-            firestoreDb.runTransaction((transaction) => {
-                return transaction.get(ref).then((doc) => {
-                    if (!doc.exists) return;
-                    const data = doc.data();
-                    const rx = data.reactions || {};
-                    const val = rx[reactionType] || 0;
-                    rx[reactionType] = val + 1;
-                    transaction.update(ref, { reactions: rx });
-                });
-            }).catch((err) => {
-                console.error("Reaction transaction error:", err);
-            });
+        function toggleSupabaseReaction(gistId, reactionType) {
+            if (!useSupabase) return;
+            supabase.rpc('increment_gist_reaction', { gist_id: gistId, reaction_type: reactionType })
+                .catch(err => console.error("Reaction error:", err));
         }
 
-        function addFirebaseEmoji(el, gistId, reactionType) {
+        function addSupabaseEmoji(el, gistId, reactionType) {
             playPopSound();
-            toggleFirebaseReaction(gistId, reactionType);
+            toggleSupabaseReaction(gistId, reactionType);
             const picker = el.parentElement;
             if (picker) picker.classList.remove('open');
         }
 
-        function deleteFirebaseGist(gistId) {
-            if (!useFirebase) return;
-            firestoreDb.collection("gists").doc(gistId).delete()
-                .then(() => {
-                    console.log("Deleted gist post:", gistId);
-                })
-                .catch((err) => {
-                    console.error("Error deleting from Firestore:", err);
-                });
+        // Keep old function names as aliases for backward-compatibility in HTML event handlers
+        function toggleFirebaseReaction(gistId, reactionType) { toggleSupabaseReaction(gistId, reactionType); }
+        function addFirebaseEmoji(el, gistId, reactionType) { addSupabaseEmoji(el, gistId, reactionType); }
+
+        function deleteSupabaseGist(gistId) {
+            if (!useSupabase) return;
+            supabase.from('gists').delete().eq('id', gistId)
+                .then(() => console.log("Deleted gist:", gistId))
+                .catch(err => console.error("Error deleting from Supabase:", err));
         }
+
+        function deleteFirebaseGist(gistId) { deleteSupabaseGist(gistId); }
 
         function submitGist() {
             const titleInput = document.getElementById('composeTitleInput');
@@ -8379,24 +8516,16 @@
             const userName = userProfile.name || 'Anonymous User';
             const userInitials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'UO';
 
-            if (useFirebase) {
-                // Post to Firestore database in real-time
-                firestoreDb.collection("gists").add({
+            if (useSupabase) {
+                // Post to Supabase gists table
+                supabase.from('gists').insert([{
                     title: title,
                     body: body,
                     image: attachedImg,
-                    userName: userName,
-                    userInitials: userInitials,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    reactions: {
-                        praying: 0,
-                        flame: 0,
-                        heart: 0,
-                        clapping: 0
-                    }
-                }).catch((err) => {
-                    console.error("Error adding Gist to Firestore:", err);
-                });
+                    user_name: userName,
+                    user_initials: userInitials,
+                    reactions: { praying: 0, flame: 0, heart: 0, clapping: 0 }
+                }]).catch(err => console.error("Error adding Gist to Supabase:", err));
             }
 
             const randomId = Date.now();
@@ -8439,8 +8568,8 @@
                 </div>
             `;
 
-            // Only prepend locally if offline/not using Firebase (real-time listener handles it for Firebase)
-            if (!useFirebase && feedList) {
+            // Only prepend locally if offline/not using Supabase (real-time listener handles it for Supabase)
+            if (!useSupabase && feedList) {
                 feedList.insertAdjacentHTML('afterbegin', postMarkup);
             }
 
@@ -8696,7 +8825,7 @@
             drawStaticLogo();
             drawHeaderLogo();
             
-            if (useFirebase) {
+            if (useSupabase) {
                 listenToGists();
             }
             
