@@ -3571,7 +3571,7 @@
                             <!-- Card 1: Blended -->
                             <div class="guardian-card selected" id="obGuardCard-mixed" onclick="selectObGuardian('mixed')">
                                 <div class="guardian-card-avatar-wrapper">
-                                    <img src=getCompanionSvgDataUrl('mixed', 'calm') class="guardian-card-avatar" alt="Blended Guide" />
+                                    <img id="obGuardAvatarMixed" class="guardian-card-avatar" alt="Blended Guide" />
                                 </div>
                                 <div class="guardian-card-content">
                                     <div class="guardian-card-header">
@@ -3585,7 +3585,7 @@
                             <!-- Card 2: Sage -->
                             <div class="guardian-card" id="obGuardCard-beige" onclick="selectObGuardian('beige')">
                                 <div class="guardian-card-avatar-wrapper">
-                                    <img src="character_calm_1786645561075.jpg" class="guardian-card-avatar" alt="Sage Guide" />
+                                    <img id="obGuardAvatarSage" class="guardian-card-avatar" alt="Sage Guide" />
                                 </div>
                                 <div class="guardian-card-content">
                                     <div class="guardian-card-header">
@@ -3599,7 +3599,7 @@
                             <!-- Card 3: Guardian -->
                             <div class="guardian-card" id="obGuardCard-grey" onclick="selectObGuardian('grey')">
                                 <div class="guardian-card-avatar-wrapper">
-                                    <img src="character_calm_black_1786645802710.jpg" class="guardian-card-avatar" alt="Guardian Guide" />
+                                    <img id="obGuardAvatarGrey" class="guardian-card-avatar" alt="Guardian Guide" />
                                 </div>
                                 <div class="guardian-card-content">
                                     <div class="guardian-card-header">
@@ -3642,7 +3642,7 @@
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg3" class="mascot-avatar-img" data-companion-state="calm" src=getCompanionSvgDataUrl('mixed', 'calm') style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg3" class="mascot-avatar-img" data-companion-state="calm" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
                             <div class="mascot-bubble" id="obMascotBubble3">
                                 Welcome! I'm Salty. What brings you to Salt today? Let's choose your main focus!
                             </div>
@@ -3718,7 +3718,7 @@
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg4" class="mascot-avatar-img" data-companion-state="calm" src=getCompanionSvgDataUrl('mixed', 'calm') style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg4" class="mascot-avatar-img" data-companion-state="calm" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
                             <div class="mascot-bubble" id="obMascotBubble4">
                                 Building habits works best when it's sustainable. How many times a week would you like to act?
                             </div>
@@ -3794,7 +3794,7 @@
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg5" class="mascot-avatar-img" data-companion-state="calm" src=getCompanionSvgDataUrl('mixed', 'calm') style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg5" class="mascot-avatar-img" data-companion-state="calm" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
                             <div class="mascot-bubble" id="obMascotBubble5">
                                 Nice choice! Let's schedule a daily nudge so you never forget to act out your faith.
                             </div>
@@ -3849,7 +3849,7 @@
                     <div>
                         <!-- Mascot Row -->
                         <div class="mascot-guidance-row">
-                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg6" class="mascot-avatar-img" data-companion-state="celebrating" src=getCompanionSvgDataUrl('mixed', 'celebrating') style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
+                            <div class="mascot-avatar-small" style="padding: 0; overflow: hidden; background: none;"><img id="obMascotImg6" class="mascot-avatar-img" data-companion-state="celebrating" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" /></div>
                             <div class="mascot-bubble" id="obMascotBubble6">
                                 We're almost there! Let's lock in your name, email, and password to form your streak profile.
                             </div>
@@ -4035,7 +4035,7 @@
                     </div>
                     <div class="sticky-avatar-wrapper">
                         <div class="guide-streak-glow" id="guideStreakGlow"></div>
-                        <img id="todayCompanionImg" src=getCompanionSvgDataUrl('mixed', 'calm') alt="3D Guide" />
+                        <img id="todayCompanionImg" alt="3D Guide" />
                         <span class="sticky-notification-badge" id="stickyBadge" style="display:none;">!</span>
                         <div class="daily-bread-badge" id="dailyBreadBadge" onclick="openDailyBreadModal(event)">🥖</div>
                     </div>
@@ -4098,7 +4098,7 @@
                             <div class="compose-avatar">UO</div>
                             <!-- Companion Avatar Mini -->
                             <div class="mascot-avatar-small" id="gistCompanionAvatar" style="width: 28px; height: 28px; padding: 0; overflow: hidden; background: none; border: 1px solid rgba(250,250,247,0.15); display: flex; align-items: center; justify-content: center; box-shadow: none; animation: none;">
-                                <img id="gistCompanionImg" src=getCompanionSvgDataUrl('mixed', 'calm') style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" />
+                                <img id="gistCompanionImg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" />
                             </div>
                         </div>
                         <div class="compose-footer-right">
@@ -4328,7 +4328,7 @@
                     <div style="display: flex; gap: 14px; align-items: center;">
                         <!-- Companion Image Showcase -->
                         <div class="mascot-avatar-small" id="profileCompanionShowcase" style="width: 54px; height: 54px; padding: 0; overflow: hidden; background: none; border: 1.5px solid var(--volt); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: none; flex-shrink: 0;">
-                            <img id="profileCompanionShowcaseImg" src=getCompanionSvgDataUrl('mixed', 'calm') style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" />
+                            <img id="profileCompanionShowcaseImg" style="width: 100%; height: 100%; object-fit: cover; object-position: center 15%; scale: 1.35;" />
                         </div>
                         
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
@@ -9329,28 +9329,39 @@ let selectedCompanionProfile = localStorage.getItem('salt_companion_profile') ||
         }
 
         function initializeVectorAssets() {
-            const landingImg = document.getElementById('landingCompanionImg');
-            if (landingImg) {
-                landingImg.src = getCompanionSvgDataUrl('mixed', 'calm');
-            }
+            // 1. Guardian Selector Cards (obScreen-2)
+            const mixedCardImg = document.getElementById('obGuardAvatarMixed') || document.querySelector('#obGuardCard-mixed .guardian-card-avatar');
+            if (mixedCardImg) mixedCardImg.src = getCompanionSvgDataUrl('mixed', 'calm');
             
-            document.querySelectorAll('.guardian-card-avatar').forEach(img => {
-                const alt = img.getAttribute('alt') || '';
-                if (alt.includes('Blended')) {
-                    img.src = getCompanionSvgDataUrl('mixed', 'calm');
-                } else if (alt.includes('Sage')) {
-                    img.src = getCompanionSvgDataUrl('beige', 'calm');
-                } else if (alt.includes('Guardian')) {
-                    img.src = getCompanionSvgDataUrl('grey', 'calm');
-                }
-            });
+            const sageCardImg = document.getElementById('obGuardAvatarSage') || document.querySelector('#obGuardCard-beige .guardian-card-avatar');
+            if (sageCardImg) sageCardImg.src = getCompanionSvgDataUrl('beige', 'calm');
+            
+            const greyCardImg = document.getElementById('obGuardAvatarGrey') || document.querySelector('#obGuardCard-grey .guardian-card-avatar');
+            if (greyCardImg) greyCardImg.src = getCompanionSvgDataUrl('grey', 'calm');
 
+            // 2. Onboarding Mascot Rows (obScreen-3 to obScreen-6)
             for (let i = 3; i <= 6; i++) {
                 const img = document.getElementById(`obMascotImg${i}`);
                 if (img) {
                     const state = img.getAttribute('data-companion-state') || 'calm';
                     img.src = getCompanionSvgDataUrl(selectedCompanionProfile, state);
                 }
+            }
+
+            // 3. Persistent In-App Widgets & Views
+            const todayImg = document.getElementById('todayCompanionImg');
+            if (todayImg) {
+                todayImg.src = getCompanionSvgDataUrl(selectedCompanionProfile, 'calm');
+            }
+
+            const gistImg = document.getElementById('gistCompanionImg');
+            if (gistImg) {
+                gistImg.src = getCompanionSvgDataUrl(selectedCompanionProfile, 'calm');
+            }
+
+            const profileShowcaseImg = document.getElementById('profileCompanionShowcaseImg');
+            if (profileShowcaseImg) {
+                profileShowcaseImg.src = getCompanionSvgDataUrl(selectedCompanionProfile, 'calm');
             }
         }
 
