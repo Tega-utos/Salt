@@ -160,15 +160,7 @@
             .view-content-wrapper {
                 padding-bottom: 24px;
             }
-            /* Hide dashboard elements and navs during onboarding active flow */
-            body.onboarding-active .desktop-sidebar-nav,
-            body.onboarding-active .modern-floating-dock,
-            body.onboarding-active .app-header,
-            body.onboarding-active #viewToday,
-            body.onboarding-active #viewGist,
-            body.onboarding-active #viewProfile {
-                display: none !important;
-            }
+
             .app-header {
                 display: none !important; /* Hide mobile top header */
             }
@@ -333,6 +325,16 @@
             .app-header {
                 padding-top: 52px;
             }
+        }
+
+        /* Hide dashboard elements and navs during onboarding active flow (Universal CSS Gating v1.1) */
+        body.onboarding-active .desktop-sidebar-nav,
+        body.onboarding-active .modern-floating-dock,
+        body.onboarding-active .app-header,
+        body.onboarding-active #viewToday,
+        body.onboarding-active #viewGist,
+        body.onboarding-active #viewProfile {
+            display: none !important;
         }
 
         #confettiCanvas {
