@@ -1,16 +1,16 @@
-const CACHE_NAME = 'salt-cache-v1';
+const CACHE_NAME = 'salt-cache-v2';
 const ASSETS = [
-  '.',
+  './',
   'index.html',
-  'manifest.json',
-  'character_calm_mixed_1786645967568.jpg'
+  'manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -28,26 +28,33 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// Network-First strategy: Try network first to always get latest updates, fallback to cache if offline
 self.addEventListener('fetch', (e) => {
+  // Only intercept GET requests from same origin
+  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(e.request).then((networkResponse) => {
-        if (networkResponse.status === 200 && e.request.url.startsWith(self.location.origin)) {
+    fetch(e.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
           const cacheCopy = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(e.request, cacheCopy);
           });
         }
         return networkResponse;
-      });
-    }).catch(() => {
-      // Offline fallback
-      if (e.request.mode === 'navigate') {
-        return caches.match('index.html');
-      }
-    })
+      })
+      .catch(() => {
+        return caches.match(e.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (e.request.mode === 'navigate') {
+            return caches.match('index.html');
+          }
+        });
+      })
   );
 });
