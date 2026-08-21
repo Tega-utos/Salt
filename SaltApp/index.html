@@ -160,6 +160,15 @@
             .view-content-wrapper {
                 padding-bottom: 24px;
             }
+            /* Hide dashboard elements and navs during onboarding active flow */
+            body.onboarding-active .desktop-sidebar-nav,
+            body.onboarding-active .modern-floating-dock,
+            body.onboarding-active .app-header,
+            body.onboarding-active #viewToday,
+            body.onboarding-active #viewGist,
+            body.onboarding-active #viewProfile {
+                display: none !important;
+            }
             .app-header {
                 display: none !important; /* Hide mobile top header */
             }
@@ -3325,7 +3334,7 @@
     </style>
     <link rel="manifest" href="manifest.json">
 </head>
-<body>
+<body class="onboarding-active">
 
 <div class="app-layout">
     <!-- Desktop Sidebar Navigation -->
@@ -4841,6 +4850,7 @@
                         }
                         
                         localStorage.setItem('salt_user_profile', JSON.stringify(finalProfile));
+                        document.body.classList.remove('onboarding-active');
                         // Read admin role from DB, never from localStorage
                         const isAdmin = finalProfile.is_admin === true;
                         // Auto-seed admin flag for the owner email if not already set
@@ -5120,6 +5130,7 @@
 
         function startDeferredSignUp() {
             playPopSound();
+            document.body.classList.add('onboarding-active');
             const obOverlay = document.getElementById('viewOnboarding');
             if (obOverlay) {
                 obOverlay.style.display = 'block';
@@ -5136,6 +5147,7 @@
 
         function startDeferredLogIn() {
             playPopSound();
+            document.body.classList.add('onboarding-active');
             const obOverlay = document.getElementById('viewOnboarding');
             if (obOverlay) {
                 obOverlay.style.display = 'block';
@@ -6890,6 +6902,8 @@
                     obOverlay.style.transform = 'none';
                 }, 300);
             }
+            document.body.classList.remove('onboarding-active');
+            switchNavTab('today');
             
             // Show the profile prompt card on home view
             const profileCard = document.getElementById('profilePromptCard');
@@ -7685,6 +7699,8 @@
                     obOverlay.style.transform = 'none';
                 }, 300);
             }
+            document.body.classList.remove('onboarding-active');
+            switchNavTab('today');
         }
         // ═════════════════════════════════════════════════════════
 // ==========================================
@@ -9345,7 +9361,11 @@ let selectedCompanionProfile = localStorage.getItem('salt_companion_profile') ||
                     obOverlay.style.display = 'none';
                     obOverlay.style.opacity = '0';
                 }
+                document.body.classList.remove('onboarding-active');
+                switchNavTab('today');
                 return;
+            } else {
+                document.body.classList.add('onboarding-active');
             }
 
             // ═════════════════════════════════════════════════════════
