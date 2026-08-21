@@ -300,6 +300,50 @@
             }
         }
 
+        /* Clean centered onboarding container on desktop viewports */
+        body.onboarding-active .app-layout {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            max-width: 100vw !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            min-height: 100dvh !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: var(--bg-base) !important;
+        }
+
+        body.onboarding-active .phone-viewport {
+            width: 100% !important;
+            max-width: 480px !important;
+            height: 100% !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        body.onboarding-active #viewOnboarding {
+            position: relative !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+        }
+
+        body.onboarding-active .onboarding-screen.active {
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
         /* Hide dashboard elements and navs during onboarding active flow (Universal CSS Gating v2.0) */
         body.onboarding-active .desktop-sidebar-nav,
         body.onboarding-active .modern-floating-dock,
