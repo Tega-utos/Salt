@@ -73,7 +73,9 @@
         /* 📱 RESPONSIVE VIEWPORT CONTAINER */
         .phone-viewport {
             flex: 1;
-            width: auto;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
             height: 100%;
             background: var(--bg-base);
             border: none;
@@ -83,7 +85,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            padding: 0 16px;
+            padding: 0;
             transition: background 0.3s ease;
         }
 
@@ -2911,19 +2913,7 @@
         }
 
         #splashTransitionOverlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #14110F;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-sizing: border-box;
-            transition: opacity 0.3s ease;
+            display: none !important;
         }
 
         /* 3D Companion Landing Container Styling */
@@ -9381,14 +9371,14 @@ let selectedCompanionProfile = localStorage.getItem('salt_companion_profile') ||
             }
 
             // ═════════════════════════════════════════════════════════
-// Ensure obScreen-1 is active initially so we can measure its logo coordinates properly!
+            // Activate Splash Screen immediately
             document.querySelectorAll('.onboarding-screen').forEach(screen => {
                 if (screen.id !== 'obScreen-1') {
                     screen.classList.remove('active');
                 }
             });
-            const ob1 = document.getElementById('obScreen-1');
-            if (ob1) ob1.classList.add('active');
+            const splashScreenEl = document.getElementById('obScreen-1');
+            if (splashScreenEl) splashScreenEl.classList.add('active');
 
             drawStaticLogo();
             drawHeaderLogo();
@@ -9398,10 +9388,6 @@ let selectedCompanionProfile = localStorage.getItem('salt_companion_profile') ||
             }
             
             syncSidebarState();
-
-            setTimeout(() => {
-                startOnboardingTransition('obScreen-1');
-            }, 300);
         }
 
         if (document.readyState === 'loading') {
