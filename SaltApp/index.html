@@ -2560,6 +2560,31 @@
             100% { transform: translate(-30px, 45px) scale(1.15); }
         }
 
+                .splash-logo-hero {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 200px;
+        }
+
+        .splash-logo-mark {
+            font-size: 56px !important;
+            letter-spacing: -1.5px !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: baseline !important;
+            justify-content: center !important;
+        }
+
+        .splash-logo-mark .logo-crystal-char {
+            width: 28px !important;
+            height: 28px !important;
+            margin: 0 2px !important;
+            transform: translateY(4px) !important;
+        }
+
         .splash-content {
             position: absolute;
             top: 0;
@@ -3426,7 +3451,7 @@
                 <div class="onboarding-progress-fill" id="obProgressFill"></div>
             </div>
             
-            <!-- SCREEN 1: SPLASH SCREEN (with animated premium mesh gradient) -->
+            <!-- SCREEN 1: SPLASH SCREEN (Pure Crystal Logo Hero) -->
             <div class="onboarding-screen active" id="obScreen-1">
                 <div class="splash-bg">
                     <div class="splash-mesh-orb splash-mesh-1"></div>
@@ -3434,20 +3459,14 @@
                     <div class="splash-mesh-orb splash-mesh-3"></div>
                 </div>
                 <div class="splash-content">
-                    <div class="logo-mark">
-                        <span class="logo-char">s</span>
-                        <canvas id="saltLogoCrystalCanvas" class="logo-crystal-char" style="width: 18px; height: 18px;"></canvas>
-                        <span class="logo-char">l</span>
-                        <span class="logo-char">t</span>
+                    <div class="splash-logo-hero">
+                        <div class="logo-mark splash-logo-mark">
+                            <span class="logo-char">s</span>
+                            <canvas id="saltLogoCrystalCanvas" class="logo-crystal-char" style="width: 28px; height: 28px;"></canvas>
+                            <span class="logo-char">l</span>
+                            <span class="logo-char">t</span>
+                        </div>
                     </div>
-
-                    <!-- 3D Companion Center Visual -->
-                    <div class="landing-companion-container hidden-state" id="landingCompanion">
-                        <img id="landingCompanionImg" src=getCompanionSvgDataUrl('mixed', 'calm') alt="3D Companion" />
-                    </div>
-
-                    <!-- Guardian selection occurs during onboarding -->
-                    <div style="height: 16px;"></div>
 
                     <div class="splash-bottom-block">
                         <h1 class="splash-title">Be salt.<br>Shake the world.</h1>
@@ -6298,14 +6317,15 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
-            canvas.width = 18 * dpr;
-            canvas.height = 18 * dpr;
+            const size = 28;
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
             ctx.scale(dpr, dpr);
-            ctx.clearRect(0, 0, 18, 18);
+            ctx.clearRect(0, 0, size, size);
             
             // ═════════════════════════════════════════════════════════
 // Draw salt crystal representing the letter "a"
-            drawSaltCrystal(ctx, 9, 9, 15, -0.12, 1.0);
+            drawSaltCrystal(ctx, size / 2, size / 2, size * 0.85, -0.12, 1.0);
         }
 
         function drawHeaderLogo() {
