@@ -1435,17 +1435,27 @@
             border-left: 1px solid rgba(20, 17, 15, 0.06);
             border-top: 1px solid rgba(20, 17, 15, 0.06);
         }
-        /* 📌 SIDE STICKY COMPANION WIDGET */
-        .side-sticky-guide {
+        /* 📌 SIDE STICKY COMPANION WIDGET: STRICT IN-APP ONLY */
+        .side-sticky-guide,
+        #sideStickyGuide,
+        #viewOnboarding .side-sticky-guide,
+        body.onboarding-active .side-sticky-guide,
+        body.onboarding-active #sideStickyGuide {
             position: fixed;
             right: 0;
             top: 50%;
             transform: translateY(-50%) translateX(30px);
             z-index: 200;
-            display: flex;
+            display: none !important;
             align-items: center;
             cursor: pointer;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Only allow display inside in-app Today view when onboarding is completed */
+        body:not(.onboarding-active) #viewToday:not([style*="display: none"]) .side-sticky-guide,
+        body:not(.onboarding-active) #viewToday:not([style*="display: none"]) #sideStickyGuide {
+            display: flex !important;
         }
         .side-sticky-guide:hover, .side-sticky-guide.active {
             transform: translateY(-50%) translateX(0);
@@ -2554,7 +2564,11 @@
             position: absolute;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
             height: 100%;
             z-index: 2;
             display: flex;
@@ -2562,7 +2576,7 @@
             justify-content: space-between;
             align-items: center;
             text-align: center;
-            padding: 60px 24px 50px;
+            padding: 44px 20px 36px;
             box-sizing: border-box;
         }
 
@@ -2577,7 +2591,7 @@
             color: #FAFAF7;
             text-transform: lowercase;
             letter-spacing: -0.5px;
-            margin-top: 10px;
+            margin-top: 6px;
         }
         .logo-char {
             line-height: 1;
@@ -2595,18 +2609,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 18px;
             width: 100%;
+            background: rgba(20, 18, 17, 0.76);
+            border: 1px solid rgba(250, 250, 247, 0.12);
+            border-radius: 28px;
+            padding: 24px 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+            box-sizing: border-box;
         }
 
         .splash-title {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 38px;
+            font-size: 32px;
             font-weight: 800;
-            line-height: 1.15;
+            line-height: 1.18;
             color: #FAFAF7;
-            letter-spacing: -1px;
-            margin: 0;
+            letter-spacing: -0.8px;
+            margin: 0 0 2px;
+            text-align: center;
         }
 
         /* CARDS & QUIZ CONTROLS */
@@ -3909,7 +3932,7 @@
         <div class="view-content-wrapper">
             
             <!-- SCREEN 1: TODAY DAILY RITUAL VIEW -->
-            <div id="viewToday">
+            <div id="viewToday" style="display:none;">
                 <div class="hero-tag-row">
                     <span class="daily-tag" id="todayChallengeTag">Today's Ritual</span>
                     <div class="timer-badge">
@@ -4026,7 +4049,7 @@
             </div>
 
             <!-- SCREEN 2: GIST CORNER — Rich Compose + Discord Reactions + Comments -->
-            <div id="viewGist">
+            <div id="viewGist" style="display:none;">
 
                 <!-- CHANNEL HEADER -->
                 <div class="gist-channel-bar">
@@ -4219,7 +4242,7 @@
         </div>
 
             <!-- SCREEN 3: PROFILE VIEW -->
-            <div id="viewProfile">
+            <div id="viewProfile" style="display:none;">
 
                 <!-- GUEST AUTH LANDING SCREEN -->
                 <div id="profileAuthLanding" style="display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 24px; min-height: 450px; z-index: 2; position: relative;">
@@ -9138,6 +9161,9 @@ let selectedCompanionProfile = localStorage.getItem('salt_companion_profile') ||
         }
 
         function triggerInactivityState() {
+            const isObCompleted = localStorage.getItem('salt_onboarding_completed') === 'true';
+            if (!isObCompleted || document.body.classList.contains('onboarding-active')) return;
+
             const todayView = document.getElementById('viewToday');
             const isActiveTab = todayView && todayView.style.display !== 'none';
             if (!isActiveTab) return;
